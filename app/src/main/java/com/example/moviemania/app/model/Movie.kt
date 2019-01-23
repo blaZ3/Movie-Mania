@@ -77,7 +77,7 @@ data class Movie(
     val language: String? = "",
 
     @SerializedName("Ratings")
-    val ratings: Rating? = Rating("", ""),
+    val ratings: List<Rating>? = listOf(),
 
     @SerializedName("Poster")
     val poster: String? = "",

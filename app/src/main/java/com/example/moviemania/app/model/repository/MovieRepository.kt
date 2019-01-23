@@ -19,6 +19,6 @@ class MovieRepository(private val dataSource: MovieDataSourceI,
     }
 
     override fun loadMovieDetail(imdbID: String): Single<Movie> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return dataSource.getMovie(imdbID)
     }
 }
