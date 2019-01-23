@@ -47,6 +47,5 @@
 
     <color name="overlay">#6e757575</color>
     <color name="screen_background">#f0f0f0</color>
-    <!--<color name="screen_background">#fff</color>-->
 
 </resources>
