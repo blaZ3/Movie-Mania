@@ -6,15 +6,22 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.dailytools.healthbuddy.base.BaseView
 
 import com.example.moviemania.R
+import com.example.moviemania.app.base.StateModel
+import com.example.moviemania.app.base.ViewEvent
+import org.koin.android.ext.android.get
+import org.koin.core.parameter.parametersOf
 
 private const val ARG_IMDBID = "ARG_IMDBID"
 
-class MovieDetailFragment : Fragment() {
-    // TODO: Rename and change types of parameters
+class MovieDetailFragment : Fragment(), BaseView {
     private var imdbId: String? = null
     private var listener: MovieDetailFragmentInteractionListener? = null
+
+
+    private lateinit var viewModel: MovieDetailViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +37,10 @@ class MovieDetailFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_movie_detail, container, false)
     }
 
+    override fun onStart() {
+        super.onStart()
+        initView()
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -43,6 +54,22 @@ class MovieDetailFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         listener = null
+    }
+
+    override fun initView() {
+        viewModel = get()
+    }
+
+    override fun getParentView(): BaseView? {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun updateView(stateModel: StateModel) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun handleEvent(event: ViewEvent) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     interface MovieDetailFragmentInteractionListener {

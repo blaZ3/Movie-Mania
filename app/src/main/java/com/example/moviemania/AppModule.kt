@@ -2,6 +2,7 @@ package com.example.moviemania
 
 import com.example.moviemania.app.model.repository.MovieRepository
 import com.example.moviemania.app.model.repository.MovieRepositoryI
+import com.example.moviemania.app.screens.movieDetail.MovieDetailViewModel
 import com.example.moviemania.app.screens.movieList.MovieListViewModel
 import com.example.moviemania.dataSource.DummyMovieDataSource
 import com.example.moviemania.dataSource.LocalMovieDataSource
@@ -41,12 +42,19 @@ class AppModule {
         }
 
         private val movieListModule = module {
-            viewModel { (name: String) -> MovieListViewModel(get(name)) }
+            viewModel {  MovieListViewModel(get("dummy")) }
         }
+
+        private val movieDetailModule = module {
+            viewModel {  MovieDetailViewModel(get("dummy")) }
+        }
+
+
 
         val appModules = listOf(
             appModule,
-            movieListModule
+            movieListModule,
+            movieDetailModule
         )
 
     }

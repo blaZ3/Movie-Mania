@@ -9,4 +9,8 @@ class LocalMovieDataSource: MovieDataSourceI {
     override fun getMovies(): Single<SearchResult> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+    override fun getMovie(imdbId: String): Single<Movie> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }

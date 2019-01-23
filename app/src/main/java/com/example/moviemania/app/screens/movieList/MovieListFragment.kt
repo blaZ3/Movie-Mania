@@ -73,7 +73,7 @@ class MovieListFragment : Fragment(), BaseView {
     }
 
     override fun initView() {
-        viewModel = get { parametersOf("dummy") }
+        viewModel = get()
 
         movieListAdapter = MovieListAdapter(
             context = activity as Context, items = listOf(),
