@@ -7,6 +7,8 @@ import com.example.moviemania.app.base.ViewEvent
 import com.example.moviemania.app.model.Movie
 import com.example.moviemania.app.model.SearchResultItem
 import com.example.moviemania.app.model.repository.MovieRepositoryI
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 class MovieListViewModel(private val movieRepo: MovieRepositoryI): BaseViewModel(){
 
@@ -18,17 +20,24 @@ class MovieListViewModel(private val movieRepo: MovieRepositoryI): BaseViewModel
     }
 
     fun loadMovies() {
-        movieRepo.loadMovies(query)
-            .doOnSuccess {
-                (model as MovieListStateModel).apply {
-                    it.searchItems?.let { items ->
-                        updateModel(this.copy(movies = items))
+        (model as MovieListStateModel).apply {
 
+            updateModel(this.copy(progress = this.progress.copy(isShown = true, text = "Loading movies...")))
+
+            movieRepo.loadMovies(query)
+                .doOnSuccess {
+                    it.searchItems?.let { items ->
+                        updateModel(this.copy(movies = items,
+                            progress = this.progress.copy(isShown = false, text = "")))
                     }
+                }.doOnError {
+                    sendEvent(MovieListError(it.message.toString()))
                 }
-            }.doOnError {
-                sendEvent(MovieListError(it.message.toString()))
-            }.subscribe()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe()
+
+        }
     }
 
 }

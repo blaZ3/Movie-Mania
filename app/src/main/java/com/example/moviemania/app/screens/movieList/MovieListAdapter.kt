@@ -25,7 +25,7 @@ class MovieListAdapter(
         fun onBind(item: SearchResultItem) {
             view.txtMovieCardName.text = item.title ?: ""
             view.txtMovieCardYear.text = item.year ?: ""
-            if (item.poster.isNullOrBlank() && item.poster.isNullOrEmpty()) {
+            if (!item.poster.isNullOrBlank() && !item.poster.isNullOrEmpty()) {
                 Picasso.get().load(item.poster).into(view.imgMovieCardPoster)
             }
 

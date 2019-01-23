@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -14,19 +15,27 @@ import com.example.moviemania.app.base.StateModel
 import com.example.moviemania.app.base.ViewEvent
 import com.example.moviemania.app.model.Movie
 import com.example.moviemania.app.model.SearchResultItem
+import com.example.moviemania.databinding.FragmentMovieListViewBinding
+import com.example.moviemania.helpers.logger.LoggerI
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider
 import com.uber.autodispose.autoDisposable
 import kotlinx.android.synthetic.main.fragment_movie_list_view.*
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 
 class MovieListFragment : Fragment(), BaseView {
 
     private var listener: MovieListFragmentInteractionListener? = null
-    private val viewModel: MovieListViewModel by inject()
+    private lateinit var viewModel: MovieListViewModel
+
+    private val logger: LoggerI by inject()
 
     private lateinit var movieListAdapter: MovieListAdapter
     private lateinit var favoriteListAdapter: FavoriteListAdapter
+
+    private lateinit var dataBinding: FragmentMovieListViewBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +48,15 @@ class MovieListFragment : Fragment(), BaseView {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_movie_list_view, container, false)
+        dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie_list_view, container,
+            false)
+        return dataBinding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        initView()
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -52,17 +67,14 @@ class MovieListFragment : Fragment(), BaseView {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        initView()
-    }
-
     override fun onDetach() {
         super.onDetach()
         listener = null
     }
 
     override fun initView() {
+        viewModel = get { parametersOf("dummy") }
+
         movieListAdapter = MovieListAdapter(
             context = activity as Context, items = listOf(),
             adapterInterface = movieListAdapterInterface
@@ -100,16 +112,22 @@ class MovieListFragment : Fragment(), BaseView {
     }
 
     override fun updateView(stateModel: StateModel) {
+        logger.d("updateView", stateModel.toString())
         (stateModel as MovieListStateModel).apply {
             movieListAdapter = MovieListAdapter(
                 items = this.movies,
                 context = activity as Context,
                 adapterInterface = movieListAdapterInterface
             )
+            recyclerMovies.adapter = movieListAdapter
+            movieListAdapter.notifyDataSetChanged()
+
+            dataBinding.stateModel = this
         }
     }
 
     override fun handleEvent(event: ViewEvent) {
+        logger.d("handleEvent", event.toString())
         (event as MovieListEvent).apply {
             when (this) {
                 InitMovieListEvent -> {

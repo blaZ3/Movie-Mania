@@ -7,6 +7,8 @@ import com.example.moviemania.dataSource.DummyMovieDataSource
 import com.example.moviemania.dataSource.LocalMovieDataSource
 import com.example.moviemania.dataSource.MovieDataSourceI
 import com.example.moviemania.dataSource.NetworkMovieDataSource
+import com.example.moviemania.helpers.logger.AppLogger
+import com.example.moviemania.helpers.logger.LoggerI
 import com.example.moviemania.helpers.stringFetcher.AppStringFetcher
 import com.example.moviemania.helpers.stringFetcher.StringFetcherI
 import org.koin.android.ext.koin.androidContext
@@ -18,6 +20,7 @@ class AppModule {
     companion object {
 
         private val appModule = module {
+            single<LoggerI> { AppLogger(BuildConfig.DEBUG) }
             single<StringFetcherI> { AppStringFetcher(androidContext()) }
 
             single<MovieDataSourceI>(name = "dummy") { DummyMovieDataSource() }
@@ -38,7 +41,7 @@ class AppModule {
         }
 
         private val movieListModule = module {
-            viewModel { MovieListViewModel(get("dummy")) }
+            viewModel { (name: String) -> MovieListViewModel(get(name)) }
         }
 
         val appModules = listOf(

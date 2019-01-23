@@ -1,26 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    android:id="@+id/layoutProgress"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="@dimen/marginNormal">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
 
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="50dp"
-        android:layout_height="50dp" />
+        <import type="android.view.View" />
 
-    <TextView
-        android:id="@+id/txtProgress"
+        <variable
+            name="stateModel"
+            type="com.example.moviemania.app.base.ProgressStateModel" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/layoutProgress"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/marginDouble"
-        android:textAppearance="@style/TextTitle"
-        android:gravity="center_horizontal"
-        android:text="@string/str_progress"/>
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/marginNormal"
+        android:visibility="@{stateModel.shown ? View.VISIBLE : View.GONE}">
 
-</LinearLayout>
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <TextView
+            android:id="@+id/txtProgress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/marginDouble"
+            android:gravity="center_horizontal"
+            android:text="@{stateModel.text}"
+            android:textAppearance="@style/TextTitle"
+            tools:text="@string/str_progress" />
+
+    </LinearLayout>
+
+</layout>

@@ -11,7 +11,7 @@ class MovieRepository(private val dataSource: MovieDataSourceI,
 
 
     override fun loadMovies(q: String): Single<SearchResult> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return dataSource.getMovies()
     }
 
     override fun loadMovies(q: String, page: Int): Single<SearchResult> {
