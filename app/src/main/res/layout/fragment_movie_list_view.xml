@@ -21,34 +21,34 @@
         android:animateLayoutChanges="true"
         tools:context=".app.screens.movieList.MovieListFragment">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="@{stateModel.hasFavorites ? View.VISIBLE : View.GONE}"
-            android:padding="@dimen/paddingNormal">
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="vertical"-->
+            <!--android:visibility="@{stateModel.hasFavorites ? View.VISIBLE : View.GONE}"-->
+            <!--android:padding="@dimen/paddingNormal">-->
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextTitle"
-                android:text="@string/str_favorites"/>
+            <!--<androidx.appcompat.widget.AppCompatTextView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:textAppearance="@style/TextTitle"-->
+                <!--android:text="@string/str_favorites"/>-->
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerFavoriteMovies"
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:orientation="horizontal"
-                tools:listitem="@layout/layout_item_fav_movie"/>
+            <!--<androidx.recyclerview.widget.RecyclerView-->
+                <!--android:id="@+id/recyclerFavoriteMovies"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="150dp"-->
+                <!--android:orientation="horizontal"-->
+                <!--tools:listitem="@layout/layout_item_fav_movie"/>-->
 
-        </LinearLayout>
+        <!--</LinearLayout>-->
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dividerHeightDouble"
-            android:background="@color/divider"
-            android:visibility="@{stateModel.hasFavorites ? View.VISIBLE : View.GONE}"
-            tools:visibility="visible"/>
+        <!--<View-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="@dimen/dividerHeightDouble"-->
+            <!--android:background="@color/divider"-->
+            <!--android:visibility="@{stateModel.hasFavorites ? View.VISIBLE : View.GONE}"-->
+            <!--tools:visibility="visible"/>-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerMovies"

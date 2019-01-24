@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.dailytools.healthbuddy.base.BaseView
 import com.example.moviemania.R
@@ -80,23 +81,13 @@ class MovieListFragment : BaseFragment() {
     override fun initView() {
         viewModel = get()
 
-        recyclerMovies.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+//        recyclerMovies.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        recyclerMovies.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         movieListAdapter = MovieListAdapter(
             context = activity as Context, items = listOf(),
             adapterInterface = movieListAdapterInterface
         )
         recyclerMovies.adapter = movieListAdapter
-
-        recyclerFavoriteMovies.layoutManager = LinearLayoutManager(
-            context, LinearLayoutManager.HORIZONTAL,
-            false
-        )
-        favoriteListAdapter = FavoriteListAdapter(
-            context = activity as Context,
-            items = listOf(),
-            adapterInterface = favoriteMoviewAdapterInterface
-        )
-        recyclerFavoriteMovies.adapter = favoriteListAdapter
 
         viewModel.getViewModelObservable()
             .autoDisposable(AndroidLifecycleScopeProvider.from(this))
@@ -119,11 +110,23 @@ class MovieListFragment : BaseFragment() {
         logger.d("updateView", stateModel.toString())
         (stateModel as MovieListStateModel).apply {
 
-            movieListAdapter.items = this.movies
+
+            val listItems = ArrayList<MovieListDataItem>()
+            if (this.hasFavorites){
+                listItems.add(MovieListDataItem(TYPE_FAVORITES, item = this.favorites.reversed()))
+            }
+            listItems.addAll(this.movies.map {
+                MovieListDataItem(TYPE_MOVIE, item = it)
+            })
+
+
+            //do diff here
+
+            movieListAdapter.items = listItems
             movieListAdapter.notifyDataSetChanged()
 
-            favoriteListAdapter.items = this.favorites.reversed()
-            favoriteListAdapter.notifyDataSetChanged()
+//            favoriteListAdapter.items = this.favorites.reversed()
+//            favoriteListAdapter.notifyDataSetChanged()
 
             dataBinding.stateModel = this
         }
