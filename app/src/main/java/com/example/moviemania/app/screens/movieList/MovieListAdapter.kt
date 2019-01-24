@@ -6,12 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.moviemania.R
 import com.example.moviemania.app.model.Movie
 import com.example.moviemania.app.model.SearchResultItem
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.layout_item_favorites.view.*
 import kotlinx.android.synthetic.main.layout_item_movie.view.*
+
 
 class MovieListAdapter(
     var items: List<MovieListDataItem>,
@@ -23,7 +25,7 @@ class MovieListAdapter(
         movieListAdapterInterface = adapterInterface
     }
 
-    abstract class MovieListViewHolder(private val view: View) : RecyclerView.ViewHolder(view)
+    abstract class MovieListViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
     class MovieFavoritesViewHolder(private val view: View, private val context: Context) : MovieListViewHolder(view) {
         fun onBind(item: MovieListDataItem) {
@@ -49,11 +51,6 @@ class MovieListAdapter(
                 Picasso.get().load(item.poster).into(view.imgMovieCardPoster)
             }
 
-            view.imgMovieCardPoster.tag = item
-            view.txtMovieCardName.tag = item
-            view.imgMovieCardDoFavorite.tag = item
-            view.imgMovieCardDoFavoriteDone.tag = item
-
             view.imgMovieCardDoFavoriteDone.visibility = View.GONE
             view.imgMovieCardDoFavorite.visibility = View.GONE
             if (item.favorited) {
@@ -63,17 +60,17 @@ class MovieListAdapter(
             }
 
             view.imgMovieCardPoster.setOnClickListener {
-                movieListAdapterInterface?.onMovieSelected(it.tag as SearchResultItem)
+                movieListAdapterInterface?.onMovieSelectedAtPosition(adapterPosition)
             }
             view.txtMovieCardName.setOnClickListener {
-                movieListAdapterInterface?.onMovieSelected(it.tag as SearchResultItem)
+                movieListAdapterInterface?.onMovieSelectedAtPosition(adapterPosition)
             }
 
             view.imgMovieCardDoFavorite.setOnClickListener {
-                movieListAdapterInterface?.onMovieFavorited(it.tag as SearchResultItem)
+                movieListAdapterInterface?.onMovieFavoritedAtPosition(adapterPosition)
             }
             view.imgMovieCardDoFavoriteDone.setOnClickListener {
-                movieListAdapterInterface?.onMovieFavorited(it.tag as SearchResultItem)
+                movieListAdapterInterface?.onMovieFavoritedAtPosition(adapterPosition)
             }
         }
     }
@@ -96,6 +93,12 @@ class MovieListAdapter(
         if (holder is MovieItemViewHolder) {
             holder.onBind(item = items[position].item as SearchResultItem)
         } else if (holder is MovieFavoritesViewHolder) {
+            val layoutParams = StaggeredGridLayoutManager.LayoutParams(
+                holder.itemView.layoutParams
+            )
+            layoutParams.isFullSpan = true
+            holder.itemView.layoutParams = layoutParams
+
             holder.onBind(item = items[position])
         }
     }
@@ -125,8 +128,11 @@ class MovieListAdapter(
     }
 
     interface MovieListAdapterInterface {
+        fun onMovieSelectedAtPosition(position: Int)
         fun onMovieSelected(item: SearchResultItem)
-        fun onMovieFavorited(item: SearchResultItem)
+
+//        fun onMovieFavorited(item: SearchResultItem)
+        fun onMovieFavoritedAtPosition(position: Int)
     }
 
 }
@@ -136,5 +142,5 @@ data class MovieListDataItem(
     val item: Any
 )
 
-val TYPE_FAVORITES = 1
-val TYPE_MOVIE = 2
+const val TYPE_FAVORITES = 1
+const val TYPE_MOVIE = 2

@@ -7,8 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.dailytools.healthbuddy.base.BaseView
 import com.example.moviemania.R
@@ -81,8 +79,8 @@ class MovieListFragment : BaseFragment() {
     override fun initView() {
         viewModel = get()
 
-//        recyclerMovies.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        recyclerMovies.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        recyclerMovies.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+
         movieListAdapter = MovieListAdapter(
             context = activity as Context, items = listOf(),
             adapterInterface = movieListAdapterInterface
@@ -109,25 +107,16 @@ class MovieListFragment : BaseFragment() {
     override fun updateView(stateModel: StateModel) {
         logger.d("updateView", stateModel.toString())
         (stateModel as MovieListStateModel).apply {
-
-
             val listItems = ArrayList<MovieListDataItem>()
-            if (this.hasFavorites){
+            if (this.hasFavorites) {
                 listItems.add(MovieListDataItem(TYPE_FAVORITES, item = this.favorites.reversed()))
             }
             listItems.addAll(this.movies.map {
                 MovieListDataItem(TYPE_MOVIE, item = it)
             })
-
-
-            //do diff here
-
+            //todo diff here
             movieListAdapter.items = listItems
             movieListAdapter.notifyDataSetChanged()
-
-//            favoriteListAdapter.items = this.favorites.reversed()
-//            favoriteListAdapter.notifyDataSetChanged()
-
             dataBinding.stateModel = this
         }
     }
@@ -160,12 +149,17 @@ class MovieListFragment : BaseFragment() {
     }
 
     private val movieListAdapterInterface = object : MovieListAdapter.MovieListAdapterInterface {
-        override fun onMovieSelected(item: SearchResultItem) {
-            listener?.onMovieSelected(item)
+
+        override fun onMovieSelectedAtPosition(position: Int) {
+            listener?.onMovieSelected(movieListAdapter.items[position].item as SearchResultItem)
         }
 
-        override fun onMovieFavorited(item: SearchResultItem) {
-            viewModel.toggleMovieFavorite(item)
+        override fun onMovieFavoritedAtPosition(position: Int) {
+            viewModel.toggleMovieFavorite(movieListAdapter.items[position].item as SearchResultItem)
+        }
+
+        override fun onMovieSelected(item: SearchResultItem) {
+            listener?.onMovieSelected(item)
         }
     }
 

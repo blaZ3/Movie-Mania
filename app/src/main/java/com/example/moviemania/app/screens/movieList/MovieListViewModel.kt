@@ -19,7 +19,7 @@ class MovieListViewModel(
     private val favRepo: FavoriteRepositoryI
 ) : BaseViewModel() {
 
-    private val query = "Hollywood"
+    private val query = listOf("hollywood", "comedy", "action" ,"series", "movies").random()
 
     private val favoriteMoviesObservable: PublishSubject<List<Movie>> = PublishSubject.create()
 
