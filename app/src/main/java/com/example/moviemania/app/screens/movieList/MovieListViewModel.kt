@@ -23,23 +23,54 @@ class MovieListViewModel(private val movieRepo: MovieRepositoryI,
 
     fun loadMovies() {
         (model as MovieListStateModel).apply {
-
             updateModel(this.copy(progress = this.progress.copy(isShown = true, text = "Loading movies...")))
+        }
 
-            movieRepo.loadMovies(query)
-                .doOnSuccess {
+
+        movieRepo.loadMovies(query)
+            .doOnSuccess {
+                (model as MovieListStateModel).apply {
                     it.searchItems?.let { items ->
                         updateModel(this.copy(movies = items,
                             progress = this.progress.copy(isShown = false, text = "")))
                     }
-                }.doOnError {
-                    sendEvent(MovieListError(it.message.toString()))
                 }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe()
+            }.doOnError {
+                sendEvent(MovieListError(it.message.toString()))
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe()
 
+    }
+
+    fun toggleMovieFavorite(item: SearchResultItem) {
+        sendEvent(FavoritingMovie)
+        item.imdbID?.let {
+            movieRepo.loadMovieDetail(it)
+                .doOnSuccess { movie ->
+                    favRepo.toggleFavorite(movie)
+                    sendEvent(FavoritingMovieDone)
+                    loadFavorites()
+                }
+                .doOnError { throwable ->
+                    sendEvent(FavoritingMovieError(throwable.message.toString()))
+                }.subscribe()
         }
+    }
+
+    fun loadFavorites(){
+        favRepo.loadFavorites()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSuccess { favorites ->
+                favorites?.let {
+                    (model as MovieListStateModel).apply {
+                        updateModel(this.copy(hasFavorites = it.isNotEmpty(), favorites = it))
+                    }
+
+                }
+            }.subscribe()
     }
 
 }
@@ -56,4 +87,7 @@ data class MovieListStateModel(
 
 sealed class MovieListEvent: ViewEvent
 object InitMovieListEvent: MovieListEvent()
-class MovieListError(msg: String): MovieListEvent()
+object FavoritingMovie: MovieListEvent()
+object FavoritingMovieDone: MovieListEvent()
+data class FavoritingMovieError(val msg: String): MovieListEvent()
+data class MovieListError(val msg: String): MovieListEvent()

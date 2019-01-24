@@ -1,16 +1,17 @@
 package com.example.moviemania.app.screens.movieList
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.dailytools.healthbuddy.base.BaseView
 import com.example.moviemania.R
+import com.example.moviemania.app.base.BaseFragment
 import com.example.moviemania.app.base.StateModel
 import com.example.moviemania.app.base.ViewEvent
 import com.example.moviemania.app.model.Movie
@@ -22,20 +23,18 @@ import com.uber.autodispose.autoDisposable
 import kotlinx.android.synthetic.main.fragment_movie_list_view.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 
 
-class MovieListFragment : Fragment(), BaseView {
+class MovieListFragment : BaseFragment() {
 
     private var listener: MovieListFragmentInteractionListener? = null
-    private lateinit var viewModel: MovieListViewModel
-
-    private val logger: LoggerI by inject()
-
+    private lateinit var dataBinding: FragmentMovieListViewBinding
     private lateinit var movieListAdapter: MovieListAdapter
     private lateinit var favoriteListAdapter: FavoriteListAdapter
+    private lateinit var viewModel: MovieListViewModel
+    private val logger: LoggerI by inject()
+    private lateinit var progressDialog: ProgressDialog
 
-    private lateinit var dataBinding: FragmentMovieListViewBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,8 +47,14 @@ class MovieListFragment : Fragment(), BaseView {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie_list_view, container,
-            false)
+        dataBinding = DataBindingUtil.inflate(
+            inflater, R.layout.fragment_movie_list_view, container,
+            false
+        )
+
+        progressDialog = ProgressDialog(activity)
+        progressDialog.setCancelable(false)
+
         return dataBinding.root
     }
 
@@ -75,22 +80,21 @@ class MovieListFragment : Fragment(), BaseView {
     override fun initView() {
         viewModel = get()
 
+        recyclerMovies.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         movieListAdapter = MovieListAdapter(
             context = activity as Context, items = listOf(),
             adapterInterface = movieListAdapterInterface
         )
-        favoriteListAdapter = FavoriteListAdapter(
-            context = activity as Context,
-            items = listOf(),
-            adaterInterface = favoriteMoviewAdapterInterface
-        )
-
-        recyclerMovies.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         recyclerMovies.adapter = movieListAdapter
 
         recyclerFavoriteMovies.layoutManager = LinearLayoutManager(
             context, LinearLayoutManager.HORIZONTAL,
             false
+        )
+        favoriteListAdapter = FavoriteListAdapter(
+            context = activity as Context,
+            items = listOf(),
+            adapterInterface = favoriteMoviewAdapterInterface
         )
         recyclerFavoriteMovies.adapter = favoriteListAdapter
 
@@ -114,13 +118,11 @@ class MovieListFragment : Fragment(), BaseView {
     override fun updateView(stateModel: StateModel) {
         logger.d("updateView", stateModel.toString())
         (stateModel as MovieListStateModel).apply {
-            movieListAdapter = MovieListAdapter(
-                items = this.movies,
-                context = activity as Context,
-                adapterInterface = movieListAdapterInterface
-            )
-            recyclerMovies.adapter = movieListAdapter
+            movieListAdapter.items = this.movies
             movieListAdapter.notifyDataSetChanged()
+
+            favoriteListAdapter.items = this.favorites
+            favoriteListAdapter.notifyDataSetChanged()
 
             dataBinding.stateModel = this
         }
@@ -132,6 +134,22 @@ class MovieListFragment : Fragment(), BaseView {
             when (this) {
                 InitMovieListEvent -> {
                     viewModel.loadMovies()
+                    viewModel.loadFavorites()
+                }
+                FavoritingMovie -> {
+                    progressDialog.setTitle("Please wait")
+                    progressDialog.setMessage("Adding movie to favorites")
+                    progressDialog.show()
+                }
+                FavoritingMovieDone -> {
+                    progressDialog.dismiss()
+                }
+                is FavoritingMovieError -> {
+                    progressDialog.dismiss()
+                    showToast(this.msg)
+                }
+                is MovieListError -> {
+                    showToast(this.msg)
                 }
             }
         }
@@ -140,6 +158,10 @@ class MovieListFragment : Fragment(), BaseView {
     private val movieListAdapterInterface = object : MovieListAdapter.MovieListAdapterInterface {
         override fun onMovieSelected(item: SearchResultItem) {
             listener?.onMovieSelected(item)
+        }
+
+        override fun onMovieFavorited(item: SearchResultItem) {
+            viewModel.toggleMovieFavorite(item)
         }
     }
 

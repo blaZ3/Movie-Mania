@@ -6,7 +6,7 @@ import io.reactivex.Single
 interface FavoriteRepositoryI {
 
     fun isFavorite(imdbId: String): Single<Boolean>
-    fun setAsFavorite(movie: Movie)
+    fun toggleFavorite(movie: Movie)
     fun loadFavorites(): Single<List<Movie>>
 
 }

@@ -11,13 +11,13 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.layout_item_fav_movie.view.*
 
 class FavoriteListAdapter(
+    var items: List<Movie>,
     private val context: Context,
-    private val items: List<Movie>,
-    private val adaterInterface: FavoriteListAdapter.FavoriteListAdapterInterface
+    adapterInterface: FavoriteListAdapter.FavoriteListAdapterInterface
 ) : RecyclerView.Adapter<FavoriteListAdapter.FavoriteListViewHolder>() {
 
     init {
-        favoriteListAdapterInterface = adaterInterface
+        favoriteListAdapterInterface = adapterInterface
     }
 
     class FavoriteListViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {

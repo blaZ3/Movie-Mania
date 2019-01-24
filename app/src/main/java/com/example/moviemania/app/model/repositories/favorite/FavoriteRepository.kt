@@ -17,8 +17,16 @@ class FavoriteRepository(private val movieDao: MovieDao): FavoriteRepositoryI {
         }
     }
 
-    override fun setAsFavorite(movie: Movie) {
-        movieDao.insertAll(movie)
+    override fun toggleFavorite(movie: Movie) {
+        val favorites = movie.imdbID?.let { movieDao.getById(it) }
+        favorites?.let {
+            if (it.isNotEmpty()){
+                movieDao.delete(movie)
+            } else{
+                movieDao.insertAll(movie)
+            }
+        }
+
     }
 
     override fun loadFavorites(): Single<List<Movie>> {

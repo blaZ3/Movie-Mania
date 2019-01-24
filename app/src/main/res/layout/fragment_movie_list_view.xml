@@ -20,25 +20,40 @@
         android:padding="@dimen/paddingNormal"
         tools:context=".app.screens.movieList.MovieListFragment">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerFavoriteMovies"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:orientation="horizontal"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:visibility="@{stateModel.hasFavorites ? View.VISIBLE : View.GONE}"
-            tools:listitem="@layout/layout_item_fav_movie"
-            tools:visibility="visible" />
+            android:padding="@dimen/paddingNormal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextTitle"
+                android:text="@string/str_favorites"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerFavoriteMovies"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:orientation="horizontal"
+                tools:listitem="@layout/layout_item_fav_movie"/>
+
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dividerHeightDouble"
             android:background="@color/divider"
-            android:visibility="@{stateModel.hasFavorites ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{stateModel.hasFavorites ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerMovies"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/marginNormal"
             android:visibility="@{stateModel.progress.shown ? View.GONE : View.VISIBLE}"
             tools:listitem="@layout/layout_item_movie"
             tools:visibility="visible" />

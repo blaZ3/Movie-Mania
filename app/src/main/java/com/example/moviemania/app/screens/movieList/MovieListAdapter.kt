@@ -11,7 +11,7 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.layout_item_movie.view.*
 
 class MovieListAdapter(
-    private val items: List<SearchResultItem>,
+    var items: List<SearchResultItem>,
     private val context: Context,
     adapterInterface: MovieListAdapterInterface
 ) : RecyclerView.Adapter<MovieListAdapter.MovieListViewHolder>() {
@@ -29,9 +29,19 @@ class MovieListAdapter(
                 Picasso.get().load(item.poster).into(view.imgMovieCardPoster)
             }
 
-            view.tag = item
-            view.setOnClickListener {
+            view.imgMovieCardPoster.tag = item
+            view.txtMovieCardName.tag = item
+            view.imgMovieCardDoFavorite.tag = item
+
+            view.imgMovieCardPoster.setOnClickListener {
                 movieListAdapterInterface?.onMovieSelected(it.tag as SearchResultItem)
+            }
+            view.txtMovieCardName.setOnClickListener {
+                movieListAdapterInterface?.onMovieSelected(it.tag as SearchResultItem)
+            }
+
+            view.imgMovieCardDoFavorite.setOnClickListener {
+                movieListAdapterInterface?.onMovieFavorited(it.tag as SearchResultItem)
             }
         }
     }
@@ -59,6 +69,7 @@ class MovieListAdapter(
 
     interface MovieListAdapterInterface {
         fun onMovieSelected(item: SearchResultItem)
+        fun onMovieFavorited(item: SearchResultItem)
     }
 
 }

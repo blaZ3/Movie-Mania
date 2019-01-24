@@ -24,5 +24,6 @@
     <dimen name="buttonSizeNormal">35dp</dimen>
     <dimen name="dividerHeight">0.75dp</dimen>
     <dimen name="dividerHeightDouble">1.5dp</dimen>
+    <dimen name="width_fav_item">250dp</dimen>
 
 </resources>

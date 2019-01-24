@@ -36,7 +36,8 @@ class AppModule {
             single<AppDatabase> {
                 Room.databaseBuilder(
                     androidContext(), AppDatabase::class.java, "movies-db"
-                ).build()
+                ).fallbackToDestructiveMigration()
+                    .build()
             }
             single { get<AppDatabase>().getMovieDao() }
 
