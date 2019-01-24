@@ -1,23 +1,40 @@
 package com.example.moviemania.dataSource.favorite
 
+import com.example.moviemania.app.db.MovieDao
 import com.example.moviemania.app.model.Movie
 import io.reactivex.Single
 
-class LocalFavoriteDataSource: FavoriteDataSourceI {
+class LocalFavoriteDataSource(private val movieDao: MovieDao) : FavoriteDataSourceI {
 
-    override fun checkIfFavorite(imdbOD: String): Single<Boolean> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun checkIfFavorite(imdbID: String): Single<Boolean> {
+        return Single.create { emitter ->
+            val favorites = movieDao.getById(imdbID)
+            if (favorites.isNotEmpty()) {
+                emitter.onSuccess(true)
+            } else {
+                emitter.onSuccess(false)
+            }
+        }
     }
 
-    override fun addFavorite(movie: Movie): Single<Movie> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun removeFavorite(movie: Movie): Single<Movie> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun toggleFavorite(movie: Movie): Single<Movie> {
+        return Single.create { emitter ->
+            val favorites = movie.imdbID?.let { movieDao.getById(it) }
+            favorites?.let {
+                if (it.isNotEmpty()) {
+                    movie.id = it[0].id
+                    movieDao.delete(movie)
+                } else {
+                    movieDao.insertAll(movie)
+                }
+            }
+            emitter.onSuccess(movie)
+        }
     }
 
     override fun getFavorites(): Single<List<Movie>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return Single.create { emitter ->
+            emitter.onSuccess(movieDao.getAll())
+        }
     }
 }

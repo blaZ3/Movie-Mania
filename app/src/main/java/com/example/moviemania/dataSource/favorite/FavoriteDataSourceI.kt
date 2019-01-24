@@ -5,9 +5,8 @@ import io.reactivex.Single
 
 interface FavoriteDataSourceI {
 
-    fun checkIfFavorite(imdbOD: String): Single<Boolean>
-    fun addFavorite(movie: Movie): Single<Movie>
-    fun removeFavorite(movie: Movie): Single<Movie>
+    fun checkIfFavorite(imdbID: String): Single<Boolean>
+    fun toggleFavorite(movie: Movie): Single<Movie>
     fun getFavorites(): Single<List<Movie>>
 
 }

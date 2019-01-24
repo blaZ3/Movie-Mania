@@ -8,6 +8,8 @@ import com.example.moviemania.app.model.repositories.movie.MovieRepository
 import com.example.moviemania.app.model.repositories.movie.MovieRepositoryI
 import com.example.moviemania.app.screens.movieDetail.MovieDetailViewModel
 import com.example.moviemania.app.screens.movieList.MovieListViewModel
+import com.example.moviemania.dataSource.favorite.FavoriteDataSourceI
+import com.example.moviemania.dataSource.favorite.LocalFavoriteDataSource
 import com.example.moviemania.dataSource.movie.DummyMovieDataSource
 import com.example.moviemania.dataSource.movie.MovieDataSourceI
 import com.example.moviemania.dataSource.movie.NetworkMovieDataSource
@@ -44,6 +46,10 @@ class AppModule {
                 )
             }
 
+            single<FavoriteDataSourceI> {
+                LocalFavoriteDataSource(movieDao = get())
+            }
+
             single<AppDatabase> {
                 Room.databaseBuilder(
                     androidContext(), AppDatabase::class.java, "movies-db"
@@ -56,7 +62,7 @@ class AppModule {
                 MovieRepository(dataSource = get(name))
             }
 
-            single<FavoriteRepositoryI> { FavoriteRepository(get()) }
+            single<FavoriteRepositoryI> { FavoriteRepository(dataSource = get()) }
 
         }
 

@@ -70,7 +70,6 @@ class MovieListViewModel(private val movieRepo: MovieRepositoryI,
                     (model as MovieListStateModel).apply {
                         updateModel(this.copy(hasFavorites = it.isNotEmpty(), favorites = it))
                     }
-
                 }
             }
             .subscribe()
