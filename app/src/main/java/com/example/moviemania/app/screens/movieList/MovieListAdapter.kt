@@ -32,6 +32,15 @@ class MovieListAdapter(
             view.imgMovieCardPoster.tag = item
             view.txtMovieCardName.tag = item
             view.imgMovieCardDoFavorite.tag = item
+            view.imgMovieCardDoFavoriteDone.tag = item
+
+            view.imgMovieCardDoFavoriteDone.visibility = View.GONE
+            view.imgMovieCardDoFavorite.visibility = View.GONE
+            if (item.favorited){
+                view.imgMovieCardDoFavoriteDone.visibility = View.VISIBLE
+            } else{
+                view.imgMovieCardDoFavorite.visibility = View.VISIBLE
+            }
 
             view.imgMovieCardPoster.setOnClickListener {
                 movieListAdapterInterface?.onMovieSelected(it.tag as SearchResultItem)
@@ -41,6 +50,9 @@ class MovieListAdapter(
             }
 
             view.imgMovieCardDoFavorite.setOnClickListener {
+                movieListAdapterInterface?.onMovieFavorited(it.tag as SearchResultItem)
+            }
+            view.imgMovieCardDoFavoriteDone.setOnClickListener {
                 movieListAdapterInterface?.onMovieFavorited(it.tag as SearchResultItem)
             }
         }

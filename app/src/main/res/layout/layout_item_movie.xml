@@ -61,6 +61,13 @@
                 android:layout_alignParentEnd="true"
                 android:src="@drawable/ic_favorite"/>
 
+            <ImageView
+                android:id="@+id/imgMovieCardDoFavoriteDone"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_favorite_filled"/>
+
         </RelativeLayout>
 
     </LinearLayout>

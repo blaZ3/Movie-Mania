@@ -26,21 +26,47 @@ class MovieListViewModel(private val movieRepo: MovieRepositoryI,
             updateModel(this.copy(progress = this.progress.copy(isShown = true, text = "Loading movies...")))
         }
 
-        movieRepo.loadMovies(query, (model as MovieListStateModel).page)
+        favRepo.loadFavorites()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess {
-                (model as MovieListStateModel).apply {
-                    it.searchItems?.let { items ->
-                        updateModel(this.copy(movies = items,
-                            progress = this.progress.copy(isShown = false, text = "")))
-                    }
-                }
-            }.doOnError {
-                sendEvent(MovieListError(it.message.toString()))
-            }
-            .subscribe()
+            .doOnSuccess { favoriteMovies ->
+                movieRepo.loadMovies(query, (model as MovieListStateModel).page)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSuccess {
+                        (model as MovieListStateModel).apply {
+                            it.searchItems?.let { items ->
+//                                updateModel(this.copy(movies = items,
+//                                    progress = this.progress.copy(isShown = false, text = "")))
 
+                                updateModel(this.copy(movies = getMergedMovies(items, favoriteMovies),
+                                    progress = this.progress.copy(isShown = false, text = "")))
+                            }
+                        }
+                    }.doOnError {
+                        sendEvent(MovieListError(it.message.toString()))
+                    }
+                    .subscribe()
+            }.subscribe()
+
+    }
+
+    private fun getMergedMovies(items: List<SearchResultItem>, favoriteMovies: List<Movie>): List<SearchResultItem> {
+        val list = ArrayList<SearchResultItem>()
+
+        val favIds = favoriteMovies.map {
+            it.imdbID
+        }
+
+        for (item in items){
+            if (favIds.contains(item.imdbID)){
+                list.add(item.copy(favorited = true))
+            } else {
+                list.add(item)
+            }
+        }
+
+        return list
     }
 
     fun toggleMovieFavorite(item: SearchResultItem) {
@@ -48,6 +74,7 @@ class MovieListViewModel(private val movieRepo: MovieRepositoryI,
         item.imdbID?.let {
             movieRepo.loadMovieDetail(it)
                 .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .observeOn(Schedulers.io())
                 .doOnSuccess { movie ->
                     favRepo.toggleFavorite(movie)

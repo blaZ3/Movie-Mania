@@ -129,5 +129,7 @@ data class SearchResultItem(
     var type: String? = "",
 
     @SerializedName("Poster")
-    var poster: String? = ""
+    var poster: String? = "",
+
+    var favorited: Boolean = false
 )
