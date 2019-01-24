@@ -10,11 +10,18 @@ import com.example.moviemania.app.model.repositories.favorite.FavoriteRepository
 import com.example.moviemania.app.model.repositories.movie.MovieRepositoryI
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
+import java.util.*
 
-class MovieListViewModel(private val movieRepo: MovieRepositoryI,
-                         private val favRepo: FavoriteRepositoryI): BaseViewModel(){
+class MovieListViewModel(
+    private val movieRepo: MovieRepositoryI,
+    private val favRepo: FavoriteRepositoryI
+) : BaseViewModel() {
 
     private val query = "Hollywood"
+
+    private val favoriteMoviesObservable: PublishSubject<List<Movie>> = PublishSubject.create()
 
     init {
         model = MovieListStateModel()
@@ -26,21 +33,24 @@ class MovieListViewModel(private val movieRepo: MovieRepositoryI,
             updateModel(this.copy(progress = this.progress.copy(isShown = true, text = "Loading movies...")))
         }
 
-        favRepo.loadFavorites()
+        loadFavorites()
+
+        favoriteMoviesObservable
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess { favoriteMovies ->
+            .doOnNext { favoriteMovies ->
                 movieRepo.loadMovies(query, (model as MovieListStateModel).page)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSuccess {
                         (model as MovieListStateModel).apply {
                             it.searchItems?.let { items ->
-//                                updateModel(this.copy(movies = items,
-//                                    progress = this.progress.copy(isShown = false, text = "")))
-
-                                updateModel(this.copy(movies = getMergedMovies(items, favoriteMovies),
-                                    progress = this.progress.copy(isShown = false, text = "")))
+                                updateModel(
+                                    this.copy(
+                                        movies = getMergedMovies(items, favoriteMovies),
+                                        progress = this.progress.copy(isShown = false, text = "")
+                                    )
+                                )
                             }
                         }
                     }.doOnError {
@@ -58,8 +68,8 @@ class MovieListViewModel(private val movieRepo: MovieRepositoryI,
             it.imdbID
         }
 
-        for (item in items){
-            if (favIds.contains(item.imdbID)){
+        for (item in items) {
+            if (favIds.contains(item.imdbID)) {
                 list.add(item.copy(favorited = true))
             } else {
                 list.add(item)
@@ -88,12 +98,13 @@ class MovieListViewModel(private val movieRepo: MovieRepositoryI,
         }
     }
 
-    fun loadFavorites(){
+    fun loadFavorites() {
         favRepo.loadFavorites()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess { favorites ->
                 favorites?.let {
+                    favoriteMoviesObservable.onNext(it)
                     (model as MovieListStateModel).apply {
                         updateModel(this.copy(hasFavorites = it.isNotEmpty(), favorites = it))
                     }
@@ -114,11 +125,11 @@ data class MovieListStateModel(
 
     val favorites: List<Movie> = listOf(),
     val movies: List<SearchResultItem> = listOf()
-): StateModel()
+) : StateModel()
 
-sealed class MovieListEvent: ViewEvent
-object InitMovieListEvent: MovieListEvent()
-object FavoritingMovie: MovieListEvent()
-object FavoritingMovieDone: MovieListEvent()
-data class FavoritingMovieError(val msg: String): MovieListEvent()
-data class MovieListError(val msg: String): MovieListEvent()
+sealed class MovieListEvent : ViewEvent
+object InitMovieListEvent : MovieListEvent()
+object FavoritingMovie : MovieListEvent()
+object FavoritingMovieDone : MovieListEvent()
+data class FavoritingMovieError(val msg: String) : MovieListEvent()
+data class MovieListError(val msg: String) : MovieListEvent()
