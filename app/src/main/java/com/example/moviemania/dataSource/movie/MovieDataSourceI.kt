@@ -6,7 +6,7 @@ import io.reactivex.Single
 
 interface MovieDataSourceI {
 
-    fun getMovies(): Single<SearchResult>
+    fun getMovies(query: String, page: Int): Single<SearchResult>
     fun getMovie(imdbId: String): Single<Movie>
 
 }

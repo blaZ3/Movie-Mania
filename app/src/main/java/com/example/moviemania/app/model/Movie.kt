@@ -40,7 +40,7 @@ import com.google.gson.annotations.SerializedName
 data class Movie(
 
     @PrimaryKey(autoGenerate = true)
-    var id: Int? = 0,
+    var id: Int? = null,
 
     @SerializedName("imdbID")
     var imdbID: String? = "",

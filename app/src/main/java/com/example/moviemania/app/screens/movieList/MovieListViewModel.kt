@@ -14,7 +14,7 @@ import io.reactivex.schedulers.Schedulers
 class MovieListViewModel(private val movieRepo: MovieRepositoryI,
                          private val favRepo: FavoriteRepositoryI): BaseViewModel(){
 
-    private val query = "the big bang"
+    private val query = "Hollywood"
 
     init {
         model = MovieListStateModel()
@@ -26,8 +26,9 @@ class MovieListViewModel(private val movieRepo: MovieRepositoryI,
             updateModel(this.copy(progress = this.progress.copy(isShown = true, text = "Loading movies...")))
         }
 
-
-        movieRepo.loadMovies(query)
+        movieRepo.loadMovies(query, (model as MovieListStateModel).page)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess {
                 (model as MovieListStateModel).apply {
                     it.searchItems?.let { items ->
@@ -38,8 +39,6 @@ class MovieListViewModel(private val movieRepo: MovieRepositoryI,
             }.doOnError {
                 sendEvent(MovieListError(it.message.toString()))
             }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
             .subscribe()
 
     }
@@ -48,6 +47,8 @@ class MovieListViewModel(private val movieRepo: MovieRepositoryI,
         sendEvent(FavoritingMovie)
         item.imdbID?.let {
             movieRepo.loadMovieDetail(it)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
                 .doOnSuccess { movie ->
                     favRepo.toggleFavorite(movie)
                     sendEvent(FavoritingMovieDone)
@@ -55,7 +56,8 @@ class MovieListViewModel(private val movieRepo: MovieRepositoryI,
                 }
                 .doOnError { throwable ->
                     sendEvent(FavoritingMovieError(throwable.message.toString()))
-                }.subscribe()
+                }
+                .subscribe()
         }
     }
 
@@ -70,7 +72,8 @@ class MovieListViewModel(private val movieRepo: MovieRepositoryI,
                     }
 
                 }
-            }.subscribe()
+            }
+            .subscribe()
     }
 
 }
@@ -80,6 +83,8 @@ data class MovieListStateModel(
     val hasFavorites: Boolean = false,
     val progress: ProgressStateModel = ProgressStateModel(),
     val isPaginating: Boolean = false,
+
+    val page: Int = 1,
 
     val favorites: List<Movie> = listOf(),
     val movies: List<SearchResultItem> = listOf()

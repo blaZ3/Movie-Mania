@@ -15,6 +15,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "ROOT", "\"http://omdbapi.com/\"")
+        buildConfigField("String", "API_KEY", "\"635ad7a2\"")
     }
     buildTypes {
         release {
@@ -64,6 +67,7 @@ dependencies {
     implementation "org.koin:koin-android-viewmodel:$koin_version"
 
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-scalars:$retrofit_version"
 
     implementation "com.google.code.gson:gson:$gson_version"

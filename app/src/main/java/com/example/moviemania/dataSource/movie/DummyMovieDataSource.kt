@@ -10,8 +10,7 @@ import java.util.concurrent.TimeUnit
 class DummyMovieDataSource: MovieDataSourceI {
 
 
-
-    override fun getMovies(): Single<SearchResult> {
+    override fun getMovies(query: String, page: Int): Single<SearchResult> {
         return Single.just(TestHelper.getDummySearchResult())
             .delay(DUMMY_DELAY, TimeUnit.MILLISECONDS)
     }

@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity(),
         supportFragmentManager
             .beginTransaction()
             .addToBackStack("HOME")
-            .replace(R.id.mainContainer, MovieDetailFragment.newInstance("", ""))
+            .replace(R.id.mainContainer, MovieDetailFragment.newInstance(imdgId))
             .commit()
     }
 

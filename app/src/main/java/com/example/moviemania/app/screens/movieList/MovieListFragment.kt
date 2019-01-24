@@ -118,10 +118,11 @@ class MovieListFragment : BaseFragment() {
     override fun updateView(stateModel: StateModel) {
         logger.d("updateView", stateModel.toString())
         (stateModel as MovieListStateModel).apply {
+
             movieListAdapter.items = this.movies
             movieListAdapter.notifyDataSetChanged()
 
-            favoriteListAdapter.items = this.favorites
+            favoriteListAdapter.items = this.favorites.reversed()
             favoriteListAdapter.notifyDataSetChanged()
 
             dataBinding.stateModel = this

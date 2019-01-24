@@ -114,10 +114,10 @@ class MovieDetailFragment : Fragment(), BaseView {
 
     companion object {
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(imdbId: String) =
             MovieDetailFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_IMDBID, param1)
+                    putString(ARG_IMDBID, imdbId)
                 }
             }
     }
