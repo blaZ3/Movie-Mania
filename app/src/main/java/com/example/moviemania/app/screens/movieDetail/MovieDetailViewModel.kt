@@ -5,11 +5,13 @@ import com.example.moviemania.app.base.ProgressStateModel
 import com.example.moviemania.app.base.StateModel
 import com.example.moviemania.app.base.ViewEvent
 import com.example.moviemania.app.model.Movie
-import com.example.moviemania.app.model.repository.MovieRepositoryI
+import com.example.moviemania.app.model.repositories.favorite.FavoriteRepositoryI
+import com.example.moviemania.app.model.repositories.movie.MovieRepositoryI
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-class MovieDetailViewModel(private val movieRepo: MovieRepositoryI): BaseViewModel() {
+class MovieDetailViewModel(private val movieRepo: MovieRepositoryI,
+                           private val favRepo: FavoriteRepositoryI): BaseViewModel() {
 
     init {
         model = MovieDetailStateModel()

@@ -6,11 +6,13 @@ import com.example.moviemania.app.base.StateModel
 import com.example.moviemania.app.base.ViewEvent
 import com.example.moviemania.app.model.Movie
 import com.example.moviemania.app.model.SearchResultItem
-import com.example.moviemania.app.model.repository.MovieRepositoryI
+import com.example.moviemania.app.model.repositories.favorite.FavoriteRepositoryI
+import com.example.moviemania.app.model.repositories.movie.MovieRepositoryI
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-class MovieListViewModel(private val movieRepo: MovieRepositoryI): BaseViewModel(){
+class MovieListViewModel(private val movieRepo: MovieRepositoryI,
+                         private val favRepo: FavoriteRepositoryI): BaseViewModel(){
 
     private val query = "the big bang"
 

@@ -1,10 +1,10 @@
-package com.example.moviemania.dataSource
+package com.example.moviemania.dataSource.movie
 
 import com.example.moviemania.app.model.Movie
 import com.example.moviemania.app.model.SearchResult
 import io.reactivex.Single
 
-class NetworkMovieDataSource: MovieDataSourceI {
+class LocalMovieDataSource: MovieDataSourceI {
 
     override fun getMovies(): Single<SearchResult> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

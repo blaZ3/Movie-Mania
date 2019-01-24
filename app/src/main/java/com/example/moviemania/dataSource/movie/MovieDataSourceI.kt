@@ -1,4 +1,4 @@
-package com.example.moviemania.dataSource
+package com.example.moviemania.dataSource.movie
 
 import com.example.moviemania.app.model.Movie
 import com.example.moviemania.app.model.SearchResult

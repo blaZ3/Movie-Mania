@@ -2,6 +2,8 @@ apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
 
+apply plugin: 'kotlin-kapt'
+
 apply plugin: 'kotlin-android-extensions'
 
 android {
@@ -54,6 +56,10 @@ dependencies {
     implementation 'com.uber.autodispose:autodispose-android-ktx:1.0.0'
     implementation 'com.uber.autodispose:autodispose-android-archcomponents-ktx:1.0.0'
 
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-rxjava2:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+
     implementation "org.koin:koin-android:$koin_version"
     implementation "org.koin:koin-android-viewmodel:$koin_version"
 
@@ -64,12 +70,13 @@ dependencies {
     implementation "com.facebook.fresco:fresco:$fresco_version"
 
     //unit testing
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0-beta01'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation "org.json:json:$test_gson_version"
     testImplementation "junit:junit:$junit_version"
     testImplementation "org.mockito:mockito-core:$mockito_core_version"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockito_kotlin_version"
     testImplementation "com.squareup.okhttp3:mockwebserver:$test_retrofit_mock_webserver_version"
+    testImplementation "androidx.room:room-testing:$room_version"
 
     //ui testing
     androidTestImplementation "com.android.support.test:runner:$test_runner_version"

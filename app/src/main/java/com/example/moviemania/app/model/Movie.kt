@@ -1,5 +1,8 @@
 package com.example.moviemania.app.model
 
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 //
@@ -33,91 +36,98 @@ import com.google.gson.annotations.SerializedName
 //    "Response": "True"
 //}
 
+@Entity
 data class Movie(
+
+    @PrimaryKey
+    var id: Int = 0,
+
     @SerializedName("imdbID")
-    val imdbID: String? = "",
+    var imdbID: String? = "",
 
     @SerializedName("imdbVotes")
-    val imdbVotes: String? = "",
+    var imdbVotes: String? = "",
 
     @SerializedName("imdbRating")
-    val imdbRating: String? = "",
+    var imdbRating: String? = "",
 
     @SerializedName("Title")
-    val title: String? = "",
+    var title: String? = "",
 
     @SerializedName("Year")
-    val year: String? = "",
+    var year: String? = "",
 
     @SerializedName("Rated")
-    val rated: String? = "",
+    var rated: String? = "",
 
     @SerializedName("Released")
-    val released: String? = "",
+    var released: String? = "",
 
     @SerializedName("Runtime")
-    val runtime: String? = "",
+    var runtime: String? = "",
 
     @SerializedName("Genre")
-    val genre: String? = "",
+    var genre: String? = "",
 
     @SerializedName("Director")
-    val director: String? = "",
+    var director: String? = "",
 
     @SerializedName("Writer")
-    val writer: String? = "",
+    var writer: String? = "",
 
     @SerializedName("Actors")
-    val actors: String? = "",
+    var actors: String? = "",
 
     @SerializedName("Plot")
-    val plot: String? = "",
+    var plot: String? = "",
 
     @SerializedName("Language")
-    val language: String? = "",
+    var language: String? = "",
 
     @SerializedName("Ratings")
-    val ratings: List<Rating>? = listOf(),
+    @Ignore
+    var ratings: List<Rating>? = listOf(),
 
     @SerializedName("Poster")
-    val poster: String? = "",
+    var poster: String? = "",
 
     @SerializedName("Response")
-    val response: Boolean = false
+    @Ignore
+    var response: Boolean = false
 )
 
 data class Rating(
     @SerializedName("Source")
-    val source: String? = "",
+    var source: String? = "",
 
     @SerializedName("Value")
-    val value: String? = ""
+    var value: String? = ""
 )
 
 data class SearchResult(
     @SerializedName("Search")
-    val searchItems: List<SearchResultItem>? = listOf(),
+    var searchItems: List<SearchResultItem>? = listOf(),
 
     @SerializedName("totalResults")
-    val totalResults: Int = 0,
+    var totalResults: Int = 0,
 
     @SerializedName("Response")
-    val response: Boolean = false
+    var response: Boolean = false
 )
 
 data class SearchResultItem(
     @SerializedName("Title")
-    val title: String? = "",
+    var title: String? = "",
 
     @SerializedName("Year")
-    val year: String? = "",
+    var year: String? = "",
 
     @SerializedName("imdbID")
-    val imdbID: String? = "",
+    var imdbID: String? = "",
 
     @SerializedName("Type")
-    val type: String? = "",
+    var type: String? = "",
 
     @SerializedName("Poster")
-    val poster: String? = ""
+    var poster: String? = ""
 )

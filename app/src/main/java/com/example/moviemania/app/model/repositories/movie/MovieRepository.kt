@@ -1,12 +1,13 @@
-package com.example.moviemania.app.model.repository
+package com.example.moviemania.app.model.repositories.movie
 
 import com.example.moviemania.app.model.Movie
 import com.example.moviemania.app.model.SearchResult
-import com.example.moviemania.dataSource.MovieDataSourceI
+import com.example.moviemania.dataSource.movie.MovieDataSourceI
 import io.reactivex.Single
 
 class MovieRepository(private val dataSource: MovieDataSourceI,
-                      private val localDataSource: MovieDataSourceI):
+                      private val localDataSource: MovieDataSourceI
+):
     MovieRepositoryI {
 
 
