@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.dailytools.healthbuddy.base.BaseView
 import com.example.moviemania.R
@@ -15,6 +16,7 @@ import com.example.moviemania.app.base.StateModel
 import com.example.moviemania.app.base.ViewEvent
 import com.example.moviemania.app.model.Movie
 import com.example.moviemania.app.model.SearchResultItem
+import com.example.moviemania.app.screens.movieList.adapter.*
 import com.example.moviemania.databinding.FragmentMovieListViewBinding
 import com.example.moviemania.helpers.logger.LoggerI
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider
@@ -29,7 +31,6 @@ class MovieListFragment : BaseFragment() {
     private var listener: MovieListFragmentInteractionListener? = null
     private lateinit var dataBinding: FragmentMovieListViewBinding
     private lateinit var movieListAdapter: MovieListAdapter
-    private lateinit var favoriteListAdapter: FavoriteListAdapter
     private lateinit var viewModel: MovieListViewModel
     private val logger: LoggerI by inject()
     private lateinit var progressDialog: ProgressDialog
@@ -107,16 +108,30 @@ class MovieListFragment : BaseFragment() {
     override fun updateView(stateModel: StateModel) {
         logger.d("updateView", stateModel.toString())
         (stateModel as MovieListStateModel).apply {
-            val listItems = ArrayList<MovieListDataItem>()
+
+            val updatedItems = ArrayList<MovieListDataItem>()
             if (this.hasFavorites) {
-                listItems.add(MovieListDataItem(TYPE_FAVORITES, item = this.favorites.reversed()))
+                updatedItems.add(
+                    MovieListDataItem(
+                        TYPE_FAVORITES,
+                        item = this.favorites.reversed()
+                    )
+                )
             }
-            listItems.addAll(this.movies.map {
-                MovieListDataItem(TYPE_MOVIE, item = it)
+            updatedItems.addAll(this.movies.map {
+                MovieListDataItem(
+                    TYPE_MOVIE,
+                    item = it
+                )
             })
-            //todo diff here
-            movieListAdapter.items = listItems
-            movieListAdapter.notifyDataSetChanged()
+
+            val diffResult = DiffUtil.calculateDiff(MovieListDiffCallback(movieListAdapter.items,
+                updatedItems))
+            diffResult.dispatchUpdatesTo(movieListAdapter)
+
+            movieListAdapter.items = updatedItems
+//            movieListAdapter.notifyDataSetChanged()
+
             dataBinding.stateModel = this
         }
     }
@@ -149,7 +164,6 @@ class MovieListFragment : BaseFragment() {
     }
 
     private val movieListAdapterInterface = object : MovieListAdapter.MovieListAdapterInterface {
-
         override fun onMovieSelectedAtPosition(position: Int) {
             listener?.onMovieSelected(movieListAdapter.items[position].item as SearchResultItem)
         }
@@ -163,11 +177,6 @@ class MovieListFragment : BaseFragment() {
         }
     }
 
-    private val favoriteMoviewAdapterInterface = object : FavoriteListAdapter.FavoriteListAdapterInterface {
-        override fun onFavoriteMovieSelected(movie: Movie) {
-            listener?.onMovieSelected(movie)
-        }
-    }
 
     interface MovieListFragmentInteractionListener {
         fun onMovieSelected(item: SearchResultItem)

@@ -1,4 +1,4 @@
-package com.example.moviemania.app.screens.movieList
+package com.example.moviemania.app.screens.movieList.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -81,7 +81,10 @@ class MovieListAdapter(
             val view = LayoutInflater.from(context).inflate(R.layout.layout_item_favorites, parent,
                 false)
 
-            return MovieFavoritesViewHolder(view, context)
+            return MovieFavoritesViewHolder(
+                view,
+                context
+            )
         }
 
         val view = LayoutInflater.from(context).inflate(R.layout.layout_item_movie, parent, false)

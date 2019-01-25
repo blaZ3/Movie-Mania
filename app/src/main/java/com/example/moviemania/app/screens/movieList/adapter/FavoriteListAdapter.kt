@@ -1,4 +1,4 @@
-package com.example.moviemania.app.screens.movieList
+package com.example.moviemania.app.screens.movieList.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.layout_item_fav_movie.view.*
 class FavoriteListAdapter(
     var items: List<Movie>,
     private val context: Context,
-    adapterInterface: FavoriteListAdapter.FavoriteListAdapterInterface
+    adapterInterface: FavoriteListAdapterInterface
 ) : RecyclerView.Adapter<FavoriteListAdapter.FavoriteListViewHolder>() {
 
     init {
