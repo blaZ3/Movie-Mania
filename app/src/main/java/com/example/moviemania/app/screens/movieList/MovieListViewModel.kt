@@ -30,7 +30,6 @@ class MovieListViewModel(
     }
 
     fun getMovies() {
-//        val query = listOf("hollywood", "comedy", "action", "series", "movies").random()
         val query = "hollywood"
         val page = 1
         (model as MovieListStateModel).apply {
