@@ -36,9 +36,11 @@ class MovieListViewModel(
         (model as MovieListStateModel).apply {
             if (!this.isPaginating) {
                 val newPage = this.page + 1
-                loadMovies(this.query!!, newPage)
-                updateModel(this.copy(page = newPage, isPaginating = true))
-                sendEvent(PaginatingEvent)
+                this.query?.let {
+                    loadMovies(it, newPage)
+                    updateModel(this.copy(page = newPage, isPaginating = true))
+                    sendEvent(PaginatingEvent)
+                }
             }
         }
     }
