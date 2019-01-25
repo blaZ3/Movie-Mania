@@ -21,20 +21,26 @@ class MovieListViewModel(
 
     init {
         model = MovieListStateModel(
-            query = listOf("hollywood", "comedy", "action", "series", "movies").random(),
             page = 1
         )
         initEvent = InitMovieListEvent
     }
 
-    fun loadMovies() {
-        loadMovies((model as MovieListStateModel).query.toString(), (model as MovieListStateModel).page)
+    fun getMovies() {
+        val query = listOf("hollywood", "comedy", "action", "series", "movies").random()
+        val page = 1
+        (model as MovieListStateModel).apply{
+            this.movies.clear()
+            getMovies(query, page)
+            updateModel(this.copy(query = query, page = page, progress = this.progress.copy(isShown = true, text = "Loading movies")))
+        }
     }
 
-    fun loadMovies(query: String) {
+    fun searchMovies(query: String) {
         (model as MovieListStateModel).apply {
+            this.movies.clear()
+            getMovies(query, 1)
             updateModel(this.copy(query = query, page = 1, isPaginating = false))
-            loadMovies(query, 1)
         }
 
     }
@@ -44,21 +50,15 @@ class MovieListViewModel(
             if (!this.isPaginating) {
                 val newPage = this.page + 1
                 this.query?.let {
-                    loadMovies(it, newPage)
-                    updateModel(this.copy(page = newPage, isPaginating = true))
+                    updateModel(this.copy(page = newPage, isPaginating = true, progress = this.progress.copy(isShown = false)))
+                    getMovies(it, newPage)
                     sendEvent(PaginatingEvent)
                 }
             }
         }
     }
 
-    private fun loadMovies(query: String, page: Int) {
-        (model as MovieListStateModel).apply {
-            if (!this.isPaginating) {
-                updateModel(this.copy(progress = this.progress.copy(isShown = true, text = "Loading movies...")))
-            }
-        }
-
+    private fun getMovies(query: String, page: Int) {
         loadFavorites()
 
         favoriteMoviesObservable
@@ -71,14 +71,23 @@ class MovieListViewModel(
                     .doOnSuccess {
                         (model as MovieListStateModel).apply {
                             it.searchItems?.let { items ->
-                                val newList: ArrayList<SearchResultItem>
 
-                                if (this.isPaginating) {
-                                    newList = this.movies
-                                    newList.addAll(getMergedMovies(items, favoriteMovies))
-                                } else {
-                                    newList = getMergedMovies(items, favoriteMovies)
+                                val newList = this.movies
+                                for (item in getMergedMovies(items, favoriteMovies)){
+                                    var updated: Boolean = false
+                                    for (i in 0 until newList.size){
+                                        if (newList[i].imdbID == item.imdbID){
+                                            newList[i] = item
+                                            updated = true
+                                            break
+                                        }
+                                    }
+
+                                    if (!updated){
+                                        newList.add(item)
+                                    }
                                 }
+
 
                                 updateModel(
                                     this.copy(

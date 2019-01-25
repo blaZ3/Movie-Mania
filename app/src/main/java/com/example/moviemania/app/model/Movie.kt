@@ -94,7 +94,18 @@ data class Movie(
     @SerializedName("Response")
     @Ignore
     var response: Boolean = false
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (other is Movie) {
+            return this.imdbID == other.imdbID
+        }
+        return false
+    }
+
+    override fun hashCode(): Int {
+        return super.hashCode()
+    }
+}
 
 data class Rating(
     @SerializedName("Source")
@@ -132,4 +143,16 @@ data class SearchResultItem(
     var poster: String? = "",
 
     var favorited: Boolean = false
-)
+){
+    override fun equals(other: Any?): Boolean {
+        if (other is SearchResultItem){
+            return this.imdbID == other.imdbID && this.favorited == other.favorited
+        }
+
+        return false
+    }
+
+    override fun hashCode(): Int {
+        return super.hashCode()
+    }
+}

@@ -154,7 +154,7 @@ class MovieListFragment : BaseFragment() {
         (event as MovieListEvent).apply {
             when (this) {
                 InitMovieListEvent -> {
-                    viewModel.loadMovies()
+                    viewModel.getMovies()
                     viewModel.loadFavorites()
                 }
                 FavoritingMovieEvent -> {
@@ -180,7 +180,7 @@ class MovieListFragment : BaseFragment() {
     }
 
     fun search(query: String){
-        viewModel.loadMovies(query)
+        viewModel.searchMovies(query)
     }
 
     private val movieListAdapterInterface = object : MovieListAdapter.MovieListAdapterInterface {
