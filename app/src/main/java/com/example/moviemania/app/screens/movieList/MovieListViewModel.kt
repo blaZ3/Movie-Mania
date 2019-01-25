@@ -29,10 +29,16 @@ class MovieListViewModel(
     fun getMovies() {
         val query = listOf("hollywood", "comedy", "action", "series", "movies").random()
         val page = 1
-        (model as MovieListStateModel).apply{
+        (model as MovieListStateModel).apply {
             this.movies.clear()
             getMovies(query, page)
-            updateModel(this.copy(query = query, page = page, progress = this.progress.copy(isShown = true, text = "Loading movies")))
+            updateModel(
+                this.copy(
+                    query = query,
+                    page = page,
+                    progress = this.progress.copy(isShown = true, text = "Loading movies")
+                )
+            )
         }
     }
 
@@ -50,7 +56,13 @@ class MovieListViewModel(
             if (!this.isPaginating) {
                 val newPage = this.page + 1
                 this.query?.let {
-                    updateModel(this.copy(page = newPage, isPaginating = true, progress = this.progress.copy(isShown = false)))
+                    updateModel(
+                        this.copy(
+                            page = newPage,
+                            isPaginating = true,
+                            progress = this.progress.copy(isShown = false)
+                        )
+                    )
                     getMovies(it, newPage)
                     sendEvent(PaginatingEvent)
                 }
@@ -69,29 +81,14 @@ class MovieListViewModel(
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSuccess {
+                        if (!it.response) {
+                            sendEvent(MovieListNetworkError)
+                        }
                         (model as MovieListStateModel).apply {
                             it.searchItems?.let { items ->
-
-                                val newList = this.movies
-                                for (item in getMergedMovies(items, favoriteMovies)){
-                                    var updated: Boolean = false
-                                    for (i in 0 until newList.size){
-                                        if (newList[i].imdbID == item.imdbID){
-                                            newList[i] = item
-                                            updated = true
-                                            break
-                                        }
-                                    }
-
-                                    if (!updated){
-                                        newList.add(item)
-                                    }
-                                }
-
-
                                 updateModel(
                                     this.copy(
-                                        movies = newList,
+                                        movies = getUpdatedList(this.movies, items, favoriteMovies),
                                         isPaginating = false,
                                         progress = this.progress.copy(isShown = false, text = "")
                                     )
@@ -106,16 +103,38 @@ class MovieListViewModel(
 
     }
 
+    private fun getUpdatedList(
+        oldItems: ArrayList<SearchResultItem>,
+        newItems: List<SearchResultItem>,
+        favoriteMovies: List<Movie>
+    ): ArrayList<SearchResultItem> {
+
+        val updateList = oldItems
+        for (item in getMergedMovies(newItems, favoriteMovies)) {
+            var updated: Boolean = false
+            for (i in 0 until updateList.size) {
+                if (updateList[i].imdbID == item.imdbID) {
+                    updateList[i] = item
+                    updated = true
+                    break
+                }
+            }
+            if (!updated) {
+                updateList.add(item)
+            }
+        }
+
+        return updateList
+    }
+
     private fun getMergedMovies(
         items: List<SearchResultItem>,
         favoriteMovies: List<Movie>
     ): ArrayList<SearchResultItem> {
         val list = ArrayList<SearchResultItem>()
-
         val favIds = favoriteMovies.map {
             it.imdbID
         }
-
         for (item in items) {
             if (favIds.contains(item.imdbID)) {
                 list.add(item.copy(favorited = true))
@@ -123,7 +142,6 @@ class MovieListViewModel(
                 list.add(item)
             }
         }
-
         return list
     }
 
@@ -182,5 +200,6 @@ object InitMovieListEvent : MovieListEvent()
 object FavoritingMovieEvent : MovieListEvent()
 object FavoritingMovieDoneEvent : MovieListEvent()
 object PaginatingEvent : MovieListEvent()
+object MovieListNetworkError : MovieListEvent()
 data class FavoritingMovieError(val msg: String) : MovieListEvent()
 data class MovieListError(val msg: String) : MovieListEvent()

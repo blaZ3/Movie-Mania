@@ -15,6 +15,8 @@ import com.example.moviemania.dataSource.movie.MovieDataSourceI
 import com.example.moviemania.dataSource.movie.NetworkMovieDataSource
 import com.example.moviemania.helpers.logger.AppLogger
 import com.example.moviemania.helpers.logger.LoggerI
+import com.example.moviemania.helpers.networkHelper.NetworkHelper
+import com.example.moviemania.helpers.networkHelper.NetworkHelperI
 import com.example.moviemania.helpers.stringFetcher.AppStringFetcher
 import com.example.moviemania.helpers.stringFetcher.StringFetcherI
 import org.koin.android.ext.koin.androidContext
@@ -31,6 +33,7 @@ class AppModule {
         private val appModule = module {
             single<LoggerI> { AppLogger(BuildConfig.DEBUG) }
             single<StringFetcherI> { AppStringFetcher(androidContext()) }
+            single<NetworkHelperI> { NetworkHelper(androidContext()) }
 
             single<Retrofit> {
                 Retrofit.Builder()
@@ -42,7 +45,8 @@ class AppModule {
             single<MovieDataSourceI>(name = "dummy") { DummyMovieDataSource() }
             single<MovieDataSourceI>(name = "network") {
                 NetworkMovieDataSource(
-                    retrofit = get(), apiKey = BuildConfig.API_KEY
+                    retrofit = get(), apiKey = BuildConfig.API_KEY,
+                    networkHelper = get()
                 )
             }
 

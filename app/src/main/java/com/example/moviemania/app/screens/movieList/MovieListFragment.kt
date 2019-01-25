@@ -20,6 +20,7 @@ import com.example.moviemania.app.model.SearchResultItem
 import com.example.moviemania.app.screens.movieList.adapter.*
 import com.example.moviemania.databinding.FragmentMovieListViewBinding
 import com.example.moviemania.helpers.logger.LoggerI
+import com.google.android.material.snackbar.Snackbar
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider
 import com.uber.autodispose.autoDisposable
 import kotlinx.android.synthetic.main.fragment_movie_list_view.*
@@ -165,6 +166,13 @@ class MovieListFragment : BaseFragment() {
                 }
                 PaginatingEvent -> {
                     showToast("Loading more, please wait...")
+                }
+                MovieListNetworkError -> {
+                    Snackbar.make(dataBinding.root, resources.getString(R.string.str_network_error),
+                        Snackbar.LENGTH_INDEFINITE).setAction("RETRY") {
+                        viewModel.getMovies()
+                        viewModel.loadFavorites()
+                    }.show()
                 }
                 is FavoritingMovieError -> {
                     progressDialog.dismiss()
