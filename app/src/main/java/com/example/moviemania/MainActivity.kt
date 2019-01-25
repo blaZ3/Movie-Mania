@@ -39,6 +39,13 @@ class MainActivity : AppCompatActivity(),
         intent?.let {
             if (Intent.ACTION_SEARCH == it.action) {
                 val query = it.getStringExtra(SearchManager.QUERY)
+
+                movieListFragment = MovieListFragment.newInstance()
+                supportFragmentManager
+                    .beginTransaction()
+                    .add(R.id.mainContainer, movieListFragment)
+                    .commit()
+                supportFragmentManager.executePendingTransactions()
                 movieListFragment.search(query)
             }
         }

@@ -91,10 +91,8 @@ class MovieListFragment : BaseFragment() {
         recyclerMovies.adapter = movieListAdapter
         recyclerMovies.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-
-                logger.d("onScrolled", "last visible item position ${layoutManager.findLastVisibleItemPositions(null)[0]}" )
-                logger.d("onScrolled", "item count ${layoutManager.itemCount}" )
-
+//                logger.d("onScrolled", "last visible item position ${layoutManager.findLastVisibleItemPositions(null)[0]}" )
+//                logger.d("onScrolled", "item count ${layoutManager.itemCount}" )
                 if(layoutManager.findLastVisibleItemPositions(null)[0] >= layoutManager.itemCount-2){
                     viewModel.paginate()
                 }
