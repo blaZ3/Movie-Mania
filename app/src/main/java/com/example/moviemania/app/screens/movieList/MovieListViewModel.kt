@@ -1,6 +1,5 @@
 package com.example.moviemania.app.screens.movieList
 
-import android.util.Log
 import com.example.moviemania.app.base.BaseViewModel
 import com.example.moviemania.app.base.ProgressStateModel
 import com.example.moviemania.app.base.StateModel
@@ -30,6 +29,14 @@ class MovieListViewModel(
 
     fun loadMovies() {
         loadMovies((model as MovieListStateModel).query.toString(), (model as MovieListStateModel).page)
+    }
+
+    fun loadMovies(query: String) {
+        (model as MovieListStateModel).apply {
+            updateModel(this.copy(query = query, page = 1, isPaginating = false))
+            loadMovies(query, 1)
+        }
+
     }
 
     fun paginate() {
@@ -65,6 +72,7 @@ class MovieListViewModel(
                         (model as MovieListStateModel).apply {
                             it.searchItems?.let { items ->
                                 val newList: ArrayList<SearchResultItem>
+
                                 if (this.isPaginating) {
                                     newList = this.movies
                                     newList.addAll(getMergedMovies(items, favoriteMovies))

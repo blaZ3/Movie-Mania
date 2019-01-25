@@ -179,6 +179,10 @@ class MovieListFragment : BaseFragment() {
         }
     }
 
+    fun search(query: String){
+        viewModel.loadMovies(query)
+    }
+
     private val movieListAdapterInterface = object : MovieListAdapter.MovieListAdapterInterface {
         override fun onMovieSelectedAtPosition(position: Int) {
             listener?.onMovieSelected(movieListAdapter.items[position].item as SearchResultItem)
