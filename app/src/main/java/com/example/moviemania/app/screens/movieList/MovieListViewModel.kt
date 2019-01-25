@@ -1,5 +1,6 @@
 package com.example.moviemania.app.screens.movieList
 
+import com.example.moviemania.R
 import com.example.moviemania.app.base.BaseViewModel
 import com.example.moviemania.app.base.ProgressStateModel
 import com.example.moviemania.app.base.StateModel
@@ -8,13 +9,15 @@ import com.example.moviemania.app.model.Movie
 import com.example.moviemania.app.model.SearchResultItem
 import com.example.moviemania.app.model.repositories.favorite.FavoriteRepositoryI
 import com.example.moviemania.app.model.repositories.movie.MovieRepositoryI
+import com.example.moviemania.helpers.stringFetcher.StringFetcherI
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 
 class MovieListViewModel(
     private val movieRepo: MovieRepositoryI,
-    private val favRepo: FavoriteRepositoryI
+    private val favRepo: FavoriteRepositoryI,
+    private val stringFetcher: StringFetcherI
 ) : BaseViewModel() {
 
     private val favoriteMoviesObservable: PublishSubject<List<Movie>> = PublishSubject.create()
@@ -36,7 +39,7 @@ class MovieListViewModel(
                 this.copy(
                     query = query,
                     page = page,
-                    progress = this.progress.copy(isShown = true, text = "Loading movies")
+                    progress = this.progress.copy(isShown = true, text = stringFetcher.getString(R.string.str_loading))
                 )
             )
         }
@@ -179,7 +182,7 @@ class MovieListViewModel(
         }
         return list
     }
-    
+
 }
 
 

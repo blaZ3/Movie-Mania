@@ -72,7 +72,7 @@ class AppModule {
 
         private val movieListModule = module {
             viewModel { MovieListViewModel(get{ parametersOf("network")},
-                favRepo = get()) }
+                favRepo = get(), stringFetcher = get()) }
         }
 
         private val movieDetailModule = module {

@@ -5,8 +5,6 @@ import com.example.moviemania.app.model.SearchResult
 import io.reactivex.Single
 
 interface MovieRepositoryI {
-
     fun loadMovies(q: String, page: Int): Single<SearchResult>
     fun loadMovieDetail(imdbID: String): Single<Movie>
-
 }

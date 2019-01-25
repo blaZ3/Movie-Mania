@@ -17,5 +17,6 @@
     <string name="str_favorites">Favorites</string>
     <string name="search_title">Search</string>
     <string name="search_hint">Search movies, series etc.</string>
+    <string name="str_loading">Loading movies</string>
 
 </resources>

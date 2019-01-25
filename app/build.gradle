@@ -75,19 +75,18 @@ dependencies {
     implementation "com.facebook.fresco:fresco:$fresco_version"
 
     //unit testing
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation "org.json:json:$test_gson_version"
     testImplementation "junit:junit:$junit_version"
     testImplementation "org.mockito:mockito-core:$mockito_core_version"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockito_kotlin_version"
     testImplementation "com.squareup.okhttp3:mockwebserver:$test_retrofit_mock_webserver_version"
-    testImplementation "androidx.room:room-testing:$room_version"
+
 
     //ui testing
     androidTestImplementation "com.android.support.test:runner:$test_runner_version"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso_core_version"
     androidTestImplementation "com.android.support.test:rules:$support_test_rules_version"
-    androidTestImplementation("com.android.support.test.espresso:espresso-contrib:$espresso_contrib_version") {
+    androidTestImplementation ("com.android.support.test.espresso:espresso-contrib:$espresso_contrib_version"){
         exclude group: 'com.android.support', module: 'appcompat-v7'
         exclude group: 'com.android.support', module: 'support-v4'
         exclude module: 'recyclerview-v7'

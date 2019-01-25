@@ -10,8 +10,7 @@ import io.reactivex.Single
 class MovieRepository(
     private val dataSource: MovieDataSourceI,
     private val localFavoriteDataSource: FavoriteDataSourceI
-) :
-    MovieRepositoryI {
+) :MovieRepositoryI {
 
     override fun loadMovies(q: String, page: Int): Single<SearchResult> {
         return dataSource.getMovies(query = q, page = page)
