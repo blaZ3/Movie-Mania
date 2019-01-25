@@ -1,5 +1,6 @@
 package com.example.moviemania.app.screens.movieList
 
+import android.util.Log
 import com.example.moviemania.app.base.BaseViewModel
 import com.example.moviemania.app.base.ProgressStateModel
 import com.example.moviemania.app.base.StateModel
@@ -10,27 +11,43 @@ import com.example.moviemania.app.model.repositories.favorite.FavoriteRepository
 import com.example.moviemania.app.model.repositories.movie.MovieRepositoryI
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
-import java.util.*
 
 class MovieListViewModel(
     private val movieRepo: MovieRepositoryI,
     private val favRepo: FavoriteRepositoryI
 ) : BaseViewModel() {
 
-    private val query = listOf("hollywood", "comedy", "action" ,"series", "movies").random()
-
     private val favoriteMoviesObservable: PublishSubject<List<Movie>> = PublishSubject.create()
 
     init {
-        model = MovieListStateModel()
+        model = MovieListStateModel(
+            query = listOf("hollywood", "comedy", "action", "series", "movies").random(),
+            page = 1
+        )
         initEvent = InitMovieListEvent
     }
 
     fun loadMovies() {
+        loadMovies((model as MovieListStateModel).query.toString(), (model as MovieListStateModel).page)
+    }
+
+    fun paginate() {
         (model as MovieListStateModel).apply {
-            updateModel(this.copy(progress = this.progress.copy(isShown = true, text = "Loading movies...")))
+            if (!this.isPaginating) {
+                val newPage = this.page + 1
+                loadMovies(this.query!!, newPage)
+                updateModel(this.copy(page = newPage, isPaginating = true))
+                sendEvent(PaginatingEvent)
+            }
+        }
+    }
+
+    private fun loadMovies(query: String, page: Int) {
+        (model as MovieListStateModel).apply {
+            if (!this.isPaginating) {
+                updateModel(this.copy(progress = this.progress.copy(isShown = true, text = "Loading movies...")))
+            }
         }
 
         loadFavorites()
@@ -39,15 +56,24 @@ class MovieListViewModel(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { favoriteMovies ->
-                movieRepo.loadMovies(query, (model as MovieListStateModel).page)
+                movieRepo.loadMovies(query, page)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSuccess {
                         (model as MovieListStateModel).apply {
                             it.searchItems?.let { items ->
+                                val newList: ArrayList<SearchResultItem>
+                                if (this.isPaginating) {
+                                    newList = this.movies
+                                    newList.addAll(getMergedMovies(items, favoriteMovies))
+                                } else {
+                                    newList = getMergedMovies(items, favoriteMovies)
+                                }
+
                                 updateModel(
                                     this.copy(
-                                        movies = getMergedMovies(items, favoriteMovies),
+                                        movies = newList,
+                                        isPaginating = false,
                                         progress = this.progress.copy(isShown = false, text = "")
                                     )
                                 )
@@ -61,7 +87,10 @@ class MovieListViewModel(
 
     }
 
-    private fun getMergedMovies(items: List<SearchResultItem>, favoriteMovies: List<Movie>): List<SearchResultItem> {
+    private fun getMergedMovies(
+        items: List<SearchResultItem>,
+        favoriteMovies: List<Movie>
+    ): ArrayList<SearchResultItem> {
         val list = ArrayList<SearchResultItem>()
 
         val favIds = favoriteMovies.map {
@@ -80,7 +109,7 @@ class MovieListViewModel(
     }
 
     fun toggleMovieFavorite(item: SearchResultItem) {
-        sendEvent(FavoritingMovie)
+        sendEvent(FavoritingMovieEvent)
         item.imdbID?.let {
             movieRepo.loadMovieDetail(it)
                 .subscribeOn(Schedulers.io())
@@ -88,7 +117,7 @@ class MovieListViewModel(
                 .observeOn(Schedulers.io())
                 .doOnSuccess { movie ->
                     favRepo.toggleFavorite(movie)
-                    sendEvent(FavoritingMovieDone)
+                    sendEvent(FavoritingMovieDoneEvent)
                     loadFavorites()
                 }
                 .doOnError { throwable ->
@@ -119,17 +148,20 @@ class MovieListViewModel(
 data class MovieListStateModel(
     val hasFavorites: Boolean = false,
     val progress: ProgressStateModel = ProgressStateModel(),
-    val isPaginating: Boolean = false,
 
     val page: Int = 1,
+    val isPaginating: Boolean = false,
+
+    val query: String? = "",
 
     val favorites: List<Movie> = listOf(),
-    val movies: List<SearchResultItem> = listOf()
+    val movies: ArrayList<SearchResultItem> = ArrayList()
 ) : StateModel()
 
 sealed class MovieListEvent : ViewEvent
 object InitMovieListEvent : MovieListEvent()
-object FavoritingMovie : MovieListEvent()
-object FavoritingMovieDone : MovieListEvent()
+object FavoritingMovieEvent : MovieListEvent()
+object FavoritingMovieDoneEvent : MovieListEvent()
+object PaginatingEvent : MovieListEvent()
 data class FavoritingMovieError(val msg: String) : MovieListEvent()
 data class MovieListError(val msg: String) : MovieListEvent()

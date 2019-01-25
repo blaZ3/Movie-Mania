@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.dailytools.healthbuddy.base.BaseView
 import com.example.moviemania.R
@@ -80,13 +81,26 @@ class MovieListFragment : BaseFragment() {
     override fun initView() {
         viewModel = get()
 
-        recyclerMovies.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-
         movieListAdapter = MovieListAdapter(
             context = activity as Context, items = listOf(),
             adapterInterface = movieListAdapterInterface
         )
+
+        val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        recyclerMovies.layoutManager = layoutManager
         recyclerMovies.adapter = movieListAdapter
+        recyclerMovies.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+
+                logger.d("onScrolled", "last visible item position ${layoutManager.findLastVisibleItemPositions(null)[0]}" )
+                logger.d("onScrolled", "item count ${layoutManager.itemCount}" )
+
+                if(layoutManager.findLastVisibleItemPositions(null)[0] >= layoutManager.itemCount-2){
+                    viewModel.paginate()
+                }
+                super.onScrolled(recyclerView, dx, dy)
+            }
+        })
 
         viewModel.getViewModelObservable()
             .autoDisposable(AndroidLifecycleScopeProvider.from(this))
@@ -130,7 +144,6 @@ class MovieListFragment : BaseFragment() {
             diffResult.dispatchUpdatesTo(movieListAdapter)
 
             movieListAdapter.items = updatedItems
-//            movieListAdapter.notifyDataSetChanged()
 
             dataBinding.stateModel = this
         }
@@ -144,13 +157,16 @@ class MovieListFragment : BaseFragment() {
                     viewModel.loadMovies()
                     viewModel.loadFavorites()
                 }
-                FavoritingMovie -> {
+                FavoritingMovieEvent -> {
                     progressDialog.setTitle("Please wait")
                     progressDialog.setMessage("Adding movie to favorites")
                     progressDialog.show()
                 }
-                FavoritingMovieDone -> {
+                FavoritingMovieDoneEvent -> {
                     progressDialog.dismiss()
+                }
+                PaginatingEvent -> {
+                    showToast("Loading more, please wait...")
                 }
                 is FavoritingMovieError -> {
                     progressDialog.dismiss()
