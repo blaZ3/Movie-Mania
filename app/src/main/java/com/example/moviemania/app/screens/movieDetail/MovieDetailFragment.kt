@@ -81,8 +81,12 @@ class MovieDetailFragment : Fragment(), BaseView {
 
 
         imgMovieDetailFavorite.setOnClickListener {
-
+            viewModel.toggleFavorite()
         }
+        imgMovieDetailFavoriteDone.setOnClickListener {
+            viewModel.toggleFavorite()
+        }
+
     }
 
     override fun getParentView(): BaseView? {

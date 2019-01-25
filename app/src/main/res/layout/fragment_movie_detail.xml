@@ -45,6 +45,7 @@
                         android:layout_height="48dp"
                         android:layout_gravity="bottom|end"
                         android:background="@drawable/background_gradient"
+                        android:visibility="@{stateModel.isFavorite ? View.GONE : View.VISIBLE}"
                         android:src="@drawable/ic_favorite" />
 
                     <ImageView
@@ -53,8 +54,8 @@
                         android:layout_height="48dp"
                         android:layout_gravity="bottom|end"
                         android:background="@drawable/background_gradient"
-                        android:src="@drawable/ic_favorite" />
-
+                        android:visibility="@{stateModel.isFavorite ? View.VISIBLE : View.GONE}"
+                        android:src="@drawable/ic_favorite_filled" />
 
                 </FrameLayout>
 
@@ -118,6 +119,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/marginNormal"
                     android:textAppearance="@style/TextNormal"
+                    android:text="@{`Actors : `+stateModel.movie.actors}"
                     tools:text="Actors" />
 
             </LinearLayout>
