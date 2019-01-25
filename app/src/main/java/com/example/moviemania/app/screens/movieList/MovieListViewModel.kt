@@ -97,10 +97,45 @@ class MovieListViewModel(
                         }
                     }.doOnError {
                         sendEvent(MovieListError(it.message.toString()))
-                    }
+                    }.doOnError { it.printStackTrace() }
                     .subscribe()
-            }.subscribe()
+            }.doOnError { it.printStackTrace() }
+            .subscribe()
 
+    }
+
+    fun toggleMovieFavorite(item: SearchResultItem) {
+        sendEvent(FavoritingMovieEvent)
+        item.imdbID?.let {
+            movieRepo.loadMovieDetail(it)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
+                .doOnSuccess { movie ->
+                    favRepo.toggleFavorite(movie)
+                    sendEvent(FavoritingMovieDoneEvent)
+                    loadFavorites()
+                }
+                .doOnError { throwable ->
+                    sendEvent(FavoritingMovieError(throwable.message.toString()))
+                }
+                .subscribe()
+        }
+    }
+
+    fun loadFavorites() {
+        favRepo.loadFavorites()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSuccess { favorites ->
+                favorites?.let {
+                    favoriteMoviesObservable.onNext(it)
+                    (model as MovieListStateModel).apply {
+                        updateModel(this.copy(hasFavorites = it.isNotEmpty(), favorites = it))
+                    }
+                }
+            }.doOnError { it.printStackTrace() }
+            .subscribe()
     }
 
     private fun getUpdatedList(
@@ -144,41 +179,7 @@ class MovieListViewModel(
         }
         return list
     }
-
-    fun toggleMovieFavorite(item: SearchResultItem) {
-        sendEvent(FavoritingMovieEvent)
-        item.imdbID?.let {
-            movieRepo.loadMovieDetail(it)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .observeOn(Schedulers.io())
-                .doOnSuccess { movie ->
-                    favRepo.toggleFavorite(movie)
-                    sendEvent(FavoritingMovieDoneEvent)
-                    loadFavorites()
-                }
-                .doOnError { throwable ->
-                    sendEvent(FavoritingMovieError(throwable.message.toString()))
-                }
-                .subscribe()
-        }
-    }
-
-    fun loadFavorites() {
-        favRepo.loadFavorites()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess { favorites ->
-                favorites?.let {
-                    favoriteMoviesObservable.onNext(it)
-                    (model as MovieListStateModel).apply {
-                        updateModel(this.copy(hasFavorites = it.isNotEmpty(), favorites = it))
-                    }
-                }
-            }
-            .subscribe()
-    }
-
+    
 }
 
 

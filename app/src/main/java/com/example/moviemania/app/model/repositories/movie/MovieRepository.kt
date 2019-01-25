@@ -23,14 +23,17 @@ class MovieRepository(
             localFavoriteDataSource.getFromFavorites(imdbID)
                 .doOnSuccess {
                     if (it.id != INVALID_ID){
-                        emitter.onSuccess(it)
+                        emitter.onSuccess(it.copy(response = true))
                     }else{
                         dataSource.getMovie(imdbID)
                             .doOnSuccess { movie ->
                                 emitter.onSuccess(movie)
                             }.subscribe()
                     }
-                }.subscribe()
+                }.doOnError {
+                    it.printStackTrace()
+                }
+                .subscribe()
         }
 
 //        return Single.concat(

@@ -16,6 +16,7 @@ import com.squareup.picasso.Picasso
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider
 import com.uber.autodispose.autoDisposable
 import kotlinx.android.synthetic.main.fragment_movie_detail.*
+import kotlinx.android.synthetic.main.layout_network_error.*
 import org.koin.android.ext.android.get
 
 private const val ARG_IMDBID = "ARG_IMDBID"
@@ -87,6 +88,11 @@ class MovieDetailFragment : Fragment(), BaseView {
             viewModel.toggleFavorite()
         }
 
+        layoutNetworkError.visibility = View.GONE
+        btnNetworkErrorRetry.setOnClickListener {
+            viewModel.getMovie(imdbId.toString())
+        }
+
     }
 
     override fun getParentView(): BaseView? {
@@ -98,6 +104,14 @@ class MovieDetailFragment : Fragment(), BaseView {
             if (!this.movie?.poster.isNullOrEmpty() && !this.movie?.poster.isNullOrBlank()){
                 Picasso.get().load(this.movie?.poster).into(imgMovieDetailPoster)
             }
+
+            if (this.showNetworkError){
+                layoutNetworkError.visibility = View.VISIBLE
+            } else{
+                layoutNetworkError.visibility = View.GONE
+            }
+            txtNetworkError.text = this.networkErrorText
+
             dataBinding.stateModel = this
         }
     }

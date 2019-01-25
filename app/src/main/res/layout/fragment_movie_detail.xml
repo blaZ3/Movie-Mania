@@ -126,12 +126,16 @@
 
         </ScrollView>
 
-
         <include
             layout="@layout/layout_progress"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             bind:stateModel="@{stateModel.progress}" />
+
+        <include
+            layout="@layout/layout_network_error"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </RelativeLayout>
 

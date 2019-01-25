@@ -71,11 +71,13 @@ class AppModule {
         }
 
         private val movieListModule = module {
-            viewModel { MovieListViewModel(get{ parametersOf("network")}, get()) }
+            viewModel { MovieListViewModel(get{ parametersOf("network")},
+                favRepo = get()) }
         }
 
         private val movieDetailModule = module {
-            viewModel { MovieDetailViewModel(get{ parametersOf("network") }, get()) }
+            viewModel { MovieDetailViewModel(get{ parametersOf("network") },
+                favRepo = get(), stringFetcher = get()) }
         }
 
 

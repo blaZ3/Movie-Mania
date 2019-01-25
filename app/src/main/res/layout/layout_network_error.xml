@@ -2,10 +2,14 @@
 <LinearLayout
     android:id="@+id/layoutNetworkError"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
+    android:visibility="gone"
+    tools:visibility="gone"
+    android:background="@color/screen_background"
     android:padding="@dimen/marginNormal">
 
 
@@ -29,6 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="@dimen/buttonSizeNormal"
         android:layout_marginTop="@dimen/marginDouble"
+        android:padding="@dimen/paddingNormal"
         android:textAppearance="@style/ButtonNormal"
         android:background="@drawable/button_background"
         android:text="Retry"/>
