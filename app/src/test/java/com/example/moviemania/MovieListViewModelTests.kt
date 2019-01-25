@@ -63,7 +63,7 @@ class MovieListViewModelTests {
 
 
     @Test
-    fun `when viewModel getMovies with dummy JSON values modelObservable should emit once`(){
+    fun `when viewModel getMovies with dummy JSON values modelObservable should emit once`() {
         whenever(favRepo.loadFavorites()).doReturn(Single.just(listOf()))
 
         val movieRepo = MovieRepository(
@@ -84,9 +84,5 @@ class MovieListViewModelTests {
             .assertNoErrors()
             .assertValueCount(1)
     }
-
-
-
-
 
 }

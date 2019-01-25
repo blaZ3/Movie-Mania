@@ -14,8 +14,7 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
-
+        testInstrumentationRunner = 'android.support.test.runner.AndroidJUnitRunner'
         buildConfigField("String", "ROOT", "\"http://omdbapi.com/\"")
         buildConfigField("String", "API_KEY", "\"635ad7a2\"")
     }

@@ -8,7 +8,6 @@ import com.example.moviemania.dataSource.movie.DummyMovieDataSource
 import com.example.moviemania.dataSource.movie.MovieDataSourceI
 import com.example.moviemania.dataSource.movie.NetworkMovieDataSource
 import com.example.moviemania.helpers.TestHelper
-import com.example.moviemania.helpers.networkHelper.NetworkHelper
 import com.example.moviemania.helpers.networkHelper.NetworkHelperI
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
@@ -20,7 +19,6 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class MovieRepositoryTests {
 
@@ -32,7 +30,7 @@ class MovieRepositoryTests {
     private lateinit var mockWebServer: MockWebServer
 
     @Before
-    fun setup(){
+    fun setup() {
         localFavoriteDataSource = mock()
         networkHelper = mock()
 
@@ -47,20 +45,21 @@ class MovieRepositoryTests {
 
 
     @Test
-    fun `when movieRepo loadMovies called with dummyDataSource it should not fail and emit once`(){
+    fun `when movieRepo loadMovies called with dummyDataSource it should not fail and emit once`() {
         val testObserver = movieRepo.loadMovies(q = TestHelper.TEST_QUERY, page = TestHelper.TEST_PAGE).test()
-        Thread.sleep(TestHelper.DUMMY_DELAY+100)
+        Thread.sleep(TestHelper.DUMMY_DELAY + 100)
         testObserver.assertNoErrors()
         testObserver.assertValueCount(1)
     }
 
 
     @Test
-    fun `when loadMovies response should be false when not connected to network`(){
+    fun `when loadMovies response should be false when not connected to network`() {
         mockWebServer.enqueue(
             MockResponse()
                 .setResponseCode(200)
-                .setBody(TestHelper.dummySearcResultJson))
+                .setBody(TestHelper.dummySearcResultJson)
+        )
 
         val retrofit = Retrofit.Builder()
             .baseUrl(mockWebServer.url("/"))
@@ -83,11 +82,12 @@ class MovieRepositoryTests {
     }
 
     @Test
-    fun `when movieRepo loadMovies called with 200 OK response and network connected`(){
+    fun `when movieRepo loadMovies called with 200 OK response and network connected`() {
         mockWebServer.enqueue(
             MockResponse()
                 .setResponseCode(200)
-                .setBody(TestHelper.dummySearcResultJson))
+                .setBody(TestHelper.dummySearcResultJson)
+        )
 
         val retrofit = Retrofit.Builder()
             .baseUrl(mockWebServer.url("/"))
@@ -110,11 +110,12 @@ class MovieRepositoryTests {
     }
 
     @Test
-    fun `when movieRepo loadMovies called with 500  response and network connected`(){
+    fun `when movieRepo loadMovies called with 500  response and network connected`() {
         mockWebServer.enqueue(
             MockResponse()
                 .setResponseCode(500)
-                .setBody(TestHelper.dummySearcResultJson))
+                .setBody(TestHelper.dummySearcResultJson)
+        )
 
         val retrofit = Retrofit.Builder()
             .baseUrl(mockWebServer.url("/"))
@@ -137,7 +138,7 @@ class MovieRepositoryTests {
     }
 
     @After
-    fun shutDown(){
+    fun shutDown() {
         mockWebServer.shutdown()
     }
 
