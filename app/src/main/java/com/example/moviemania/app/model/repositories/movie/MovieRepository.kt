@@ -1,11 +1,16 @@
 package com.example.moviemania.app.model.repositories.movie
 
+import com.example.moviemania.app.model.INVALID_ID
 import com.example.moviemania.app.model.Movie
 import com.example.moviemania.app.model.SearchResult
+import com.example.moviemania.dataSource.favorite.FavoriteDataSourceI
 import com.example.moviemania.dataSource.movie.MovieDataSourceI
 import io.reactivex.Single
 
-class MovieRepository(private val dataSource: MovieDataSourceI):
+class MovieRepository(
+    private val dataSource: MovieDataSourceI,
+    private val localFavoriteDataSource: FavoriteDataSourceI
+) :
     MovieRepositoryI {
 
     override fun loadMovies(q: String, page: Int): Single<SearchResult> {
@@ -13,6 +18,25 @@ class MovieRepository(private val dataSource: MovieDataSourceI):
     }
 
     override fun loadMovieDetail(imdbID: String): Single<Movie> {
-        return dataSource.getMovie(imdbID)
+
+        return Single.create { emitter ->
+            localFavoriteDataSource.getFromFavorites(imdbID)
+                .doOnSuccess {
+                    if (it.id != INVALID_ID){
+                        emitter.onSuccess(it)
+                    }else{
+                        dataSource.getMovie(imdbID)
+                            .doOnSuccess { movie ->
+                                emitter.onSuccess(movie)
+                            }.subscribe()
+                    }
+                }.subscribe()
+        }
+
+//        return Single.concat(
+//            dataSource.getMovie(imdbID),
+//            localFavoriteDataSource.getFromFavorites(imdbID)
+//        ).filter { it.id != INVALID_ID }
+//            .first(Movie())
     }
 }

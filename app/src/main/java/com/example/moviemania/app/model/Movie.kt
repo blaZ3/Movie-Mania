@@ -133,3 +133,6 @@ data class SearchResultItem(
 
     var favorited: Boolean = false
 )
+
+
+const val INVALID_ID = -1

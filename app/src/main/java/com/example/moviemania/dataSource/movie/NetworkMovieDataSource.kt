@@ -8,23 +8,24 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 
-class NetworkMovieDataSource(retrofit: Retrofit, private val apiKey: String): MovieDataSourceI {
+class NetworkMovieDataSource(retrofit: Retrofit, private val apiKey: String) : MovieDataSourceI {
 
     private var service: MovieService = retrofit.create(MovieService::class.java)
 
     override fun getMovies(query: String, page: Int): Single<SearchResult> {
         return Single.create { emitter ->
-            service.search(apiKey, q = query, page = page.toString()).enqueue(object :Callback<SearchResult>{
+            service.search(apiKey, q = query, page = page.toString()).enqueue(object : Callback<SearchResult> {
                 override fun onResponse(call: Call<SearchResult>, response: Response<SearchResult>) {
                     response.body()?.let {
-                        if (response.isSuccessful && it.response!!){
+                        if (response.isSuccessful && it.response!!) {
                             emitter.onSuccess(it)
-                        } else{
+                        } else {
                             emitter.onSuccess(SearchResult(response = false))
                         }
                     }
 
                 }
+
                 override fun onFailure(call: Call<SearchResult>, t: Throwable) {
                     emitter.onError(t)
                 }
@@ -35,12 +36,12 @@ class NetworkMovieDataSource(retrofit: Retrofit, private val apiKey: String): Mo
 
     override fun getMovie(imdbId: String): Single<Movie> {
         return Single.create { emitter ->
-            service.movieDetail(apiKey, imdbID = imdbId).enqueue(object : Callback<Movie>{
+            service.movieDetail(apiKey, imdbID = imdbId).enqueue(object : Callback<Movie> {
                 override fun onResponse(call: Call<Movie>, response: Response<Movie>) {
                     response.body()?.let {
-                        if (response.isSuccessful && it.response){
+                        if (response.isSuccessful && it.response) {
                             emitter.onSuccess(it)
-                        }else{
+                        } else {
                             emitter.onSuccess(Movie(response = false))
                         }
                     }

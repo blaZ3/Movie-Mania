@@ -1,6 +1,7 @@
 package com.example.moviemania.dataSource.favorite
 
 import com.example.moviemania.app.db.MovieDao
+import com.example.moviemania.app.model.INVALID_ID
 import com.example.moviemania.app.model.Movie
 import io.reactivex.Single
 
@@ -35,6 +36,17 @@ class LocalFavoriteDataSource(private val movieDao: MovieDao) : FavoriteDataSour
     override fun getFavorites(): Single<List<Movie>> {
         return Single.create { emitter ->
             emitter.onSuccess(movieDao.getAll())
+        }
+    }
+
+    override fun getFromFavorites(imdbID: String): Single<Movie> {
+        return Single.create { emitter ->
+            val favorites = movieDao.getById(imdbID)
+            if (favorites.isNotEmpty()){
+                emitter.onSuccess(favorites[0])
+            }else{
+                emitter.onSuccess(Movie(id = INVALID_ID))
+            }
         }
     }
 }

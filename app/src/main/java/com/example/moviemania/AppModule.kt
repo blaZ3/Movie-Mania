@@ -59,7 +59,7 @@ class AppModule {
             single { get<AppDatabase>().getMovieDao() }
 
             single<MovieRepositoryI>{ (name: String) ->
-                MovieRepository(dataSource = get(name))
+                MovieRepository(dataSource = get(name), localFavoriteDataSource = get())
             }
 
             single<FavoriteRepositoryI> { FavoriteRepository(dataSource = get()) }
