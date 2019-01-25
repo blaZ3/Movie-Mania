@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity(),
     MovieListFragment.MovieListFragmentInteractionListener, MovieDetailFragment.MovieDetailFragmentInteractionListener {
 
-    private lateinit var movieListFragment: MovieListFragment
+    private var movieListFragment: MovieListFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,11 +27,13 @@ class MainActivity : AppCompatActivity(),
         initToolbar()
 
         movieListFragment = MovieListFragment.newInstance()
+        movieListFragment?.let {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.mainContainer, it)
+                .commit()
+        }
 
-        supportFragmentManager
-            .beginTransaction()
-            .add(R.id.mainContainer, movieListFragment)
-            .commit()
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -39,14 +41,7 @@ class MainActivity : AppCompatActivity(),
         intent?.let {
             if (Intent.ACTION_SEARCH == it.action) {
                 val query = it.getStringExtra(SearchManager.QUERY)
-
-                movieListFragment = MovieListFragment.newInstance()
-                supportFragmentManager
-                    .beginTransaction()
-                    .add(R.id.mainContainer, movieListFragment)
-                    .commit()
-                supportFragmentManager.executePendingTransactions()
-                movieListFragment.search(query)
+                movieListFragment?.search(query)
             }
         }
 
@@ -73,9 +68,7 @@ class MainActivity : AppCompatActivity(),
         movie.imdbID?.let { navigateToMovieDetail(it) }
     }
 
-    override fun onAction() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun onAction() { }
 
     private fun navigateToMovieDetail(imdgId: String) {
         supportFragmentManager
