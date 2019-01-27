@@ -59,6 +59,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_alignParentEnd="true"
+                android:visibility="gone"
                 android:src="@drawable/ic_favorite"/>
 
             <ImageView
@@ -66,7 +67,15 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_alignParentEnd="true"
+                android:visibility="gone"
                 android:src="@drawable/ic_favorite_filled"/>
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottieFavorite"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                app:lottie_rawRes="@raw/like"/>
 
         </RelativeLayout>
 
