@@ -84,7 +84,7 @@ class MovieListFragment : BaseFragment() {
 
         movieListAdapter = MovieListAdapter(
             context = activity as Context, items = listOf(),
-            adapterInterface = movieListAdapterInterface
+            movieListAdapterInterface = movieListAdapterInterface
         )
 
         val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -194,7 +194,7 @@ class MovieListFragment : BaseFragment() {
             listener?.onMovieSelected(movieListAdapter.items[position].item as SearchResultItem)
         }
 
-        override fun onMovieFavoritedAtPosition(position: Int) {
+        override fun onMovieFavoritesAtPosition(position: Int) {
             viewModel.toggleMovieFavorite(movieListAdapter.items[position].item as SearchResultItem)
         }
 

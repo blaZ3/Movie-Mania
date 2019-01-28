@@ -13,36 +13,42 @@ import com.example.moviemania.app.model.SearchResultItem
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.layout_item_favorites.view.*
 import kotlinx.android.synthetic.main.layout_item_movie.view.*
+import java.lang.ref.WeakReference
 
 
 class MovieListAdapter(
     var items: List<MovieListDataItem>,
-    private val context: Context,
-    adapterInterface: MovieListAdapterInterface
+    context: Context,
+    private val movieListAdapterInterface: MovieListAdapterInterface
 ) : RecyclerView.Adapter<MovieListAdapter.MovieListViewHolder>() {
 
-    init {
-        movieListAdapterInterface = adapterInterface
-    }
+    private var weakContext: WeakReference<Context> = WeakReference(context)
 
     abstract class MovieListViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
-    class MovieFavoritesViewHolder(private val view: View, private val context: Context) : MovieListViewHolder(view) {
+    class MovieFavoritesViewHolder(
+        private val view: View,
+        private val adapterInterface: FavoriteListAdapter.FavoriteListAdapterInterface
+    ) : MovieListViewHolder(view) {
         fun onBind(item: MovieListDataItem) {
             view.recyclerFavoriteMovies.layoutManager = LinearLayoutManager(
-                context, LinearLayoutManager.HORIZONTAL,
-                false)
+                view.context, LinearLayoutManager.HORIZONTAL,
+                false
+            )
             val favoriteListAdapter = FavoriteListAdapter(
-                context = context,
+                context = view.context,
                 items = item.item as List<Movie>,
-                adapterInterface = favoriteMovieAdapterInterface!!
+                adapterInterface = adapterInterface
             )
 
             view.recyclerFavoriteMovies.adapter = favoriteListAdapter
         }
     }
 
-    class MovieItemViewHolder(private val view: View) : MovieListViewHolder(view) {
+    class MovieItemViewHolder(
+        private val view: View,
+        private val movieListAdapterInterface: MovieListAdapterInterface
+    ) : MovieListViewHolder(view) {
 
         fun onBind(item: SearchResultItem) {
             view.txtMovieCardName.text = item.title ?: ""
@@ -60,17 +66,17 @@ class MovieListAdapter(
             }
 
             view.imgMovieCardPoster.setOnClickListener {
-                movieListAdapterInterface?.onMovieSelectedAtPosition(adapterPosition)
+                movieListAdapterInterface.onMovieSelectedAtPosition(adapterPosition)
             }
             view.txtMovieCardName.setOnClickListener {
-                movieListAdapterInterface?.onMovieSelectedAtPosition(adapterPosition)
+                movieListAdapterInterface.onMovieSelectedAtPosition(adapterPosition)
             }
 
             view.imgMovieCardDoFavorite.setOnClickListener {
-                movieListAdapterInterface?.onMovieFavoritedAtPosition(adapterPosition)
+                movieListAdapterInterface.onMovieFavoritesAtPosition(adapterPosition)
             }
             view.imgMovieCardDoFavoriteDone.setOnClickListener {
-                movieListAdapterInterface?.onMovieFavoritedAtPosition(adapterPosition)
+                movieListAdapterInterface.onMovieFavoritesAtPosition(adapterPosition)
             }
         }
     }
@@ -78,17 +84,16 @@ class MovieListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieListViewHolder {
         if (viewType == TYPE_FAVORITES) {
-            val view = LayoutInflater.from(context).inflate(R.layout.layout_item_favorites, parent,
-                false)
-
-            return MovieFavoritesViewHolder(
-                view,
-                context
+            val view = LayoutInflater.from(weakContext.get()).inflate(
+                R.layout.layout_item_favorites, parent,
+                false
             )
+
+            return MovieFavoritesViewHolder(view, favoriteMovieAdapterInterface)
         }
 
-        val view = LayoutInflater.from(context).inflate(R.layout.layout_item_movie, parent, false)
-        return MovieItemViewHolder(view)
+        val view = LayoutInflater.from(weakContext.get()).inflate(R.layout.layout_item_movie, parent, false)
+        return MovieItemViewHolder(view, movieListAdapterInterface)
     }
 
 
@@ -116,26 +121,21 @@ class MovieListAdapter(
     }
 
 
-    companion object {
-        private var movieListAdapterInterface: MovieListAdapterInterface? = null
-        private var favoriteMovieAdapterInterface = object : FavoriteListAdapter.FavoriteListAdapterInterface {
-            override fun onFavoriteMovieSelected(movie: Movie) {
-                movieListAdapterInterface?.onMovieSelected(
-                    SearchResultItem(
-                        title = movie.title,
-                        imdbID = movie.imdbID
-                    )
+    private var favoriteMovieAdapterInterface = object : FavoriteListAdapter.FavoriteListAdapterInterface {
+        override fun onFavoriteMovieSelected(movie: Movie) {
+            movieListAdapterInterface.onMovieSelected(
+                SearchResultItem(
+                    title = movie.title,
+                    imdbID = movie.imdbID
                 )
-            }
+            )
         }
     }
 
     interface MovieListAdapterInterface {
         fun onMovieSelectedAtPosition(position: Int)
         fun onMovieSelected(item: SearchResultItem)
-
-//        fun onMovieFavorited(item: SearchResultItem)
-        fun onMovieFavoritedAtPosition(position: Int)
+        fun onMovieFavoritesAtPosition(position: Int)
     }
 
 }
